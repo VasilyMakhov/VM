@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{%block title %}
+Регистрация - VM
+{% endblock %}
+
+{% block content %}
+
+<h2>Регистрация</h2>
+
+<form>
+    <label>
+        ЛОГИН:<input type="text" name="username">
+    </label>
+
+    
+
+    <label>
+        ПОЧТА:<input type="email" name="email">
+    </label>
+
+    
+
+    <label>
+        ПАРОЛЬ:<input type="password" name="password">
+    </label>
+
+    
+
+    <button type="submit">ЗАРЕГЕСТРИРОВАТЬСЯ</button>
+</form>
+
+{% endblock %}
