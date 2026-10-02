@@ -5,9 +5,23 @@
 {% endblock %}
 
 {% block content %}
-<h2>Каталог товаров</h2>
-<p>
-    В будущем тут возможно чет даже появится :/
-</p>
+<div class="cat-head">
+    <h2>Каталог товаров</h2>
+    <p> Выберите товар который вам приглянулся</p>
+</div>
+<div class="products">
+    {% for product in products %}
+
+    <div class="product">
+        
+        <h3>{{product.name}}</h3>
+        <p>{{product.description}}</p>
+        <p class="price">{{product.price}} Р</p>
+        <button>Подробнее</button>
+    </div>
+
+    {% endfor %}
+    
+</div>
 
 {% endblock %}

@@ -1,17 +1,17 @@
 body{
     margin: 0; /* Внешний отсутп */
-    background-color: white;
+    background-color: lightgray;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 header{
-    background-color: lightgray;
+    background-color: white;
     padding: 20px;
     border-bottom: 2px solid orangered;
 }
 
 header h1{
-    margin: 0 0 15px 0; /* Внешний отсутп */
+    margin: 0 0 15px 0; 
     color: orangered;
 }
 
@@ -54,6 +54,8 @@ button{
     color: white;
     border: none;
     padding: 10px 15px;
+    cursor: pointer;
+    font-size: 15px;
 }
 
 button:hover{
@@ -67,11 +69,66 @@ input{
     border: 1px solid gray;
 }
 
-form{
-    width: 300px;
-}
-
 label{
     display: block;
     margin-bottom: 15px;
+}
+
+.welcome{
+    background-color: white;
+    padding: 20px;
+    border: 1px solid orangered;
+}
+
+.products{
+    display: flex;
+    gap: 20px;
+}
+
+.product{
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 15px;
+    width: 250px;
+}
+
+.price{
+    color: orangered;
+    font-size: 18px;
+}
+
+.cat-head{
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.cat-head h2{
+    margin-top: 0;
+}
+
+.logform{
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 20px;
+    width: 300px;  
+}
+
+.logform h2{
+    margin-top: 0;
+}
+
+.welcome h2{
+    margin-top: 0;
+}
+
+.logform a{
+    color: orangered;
+    text-decoration: none;
+}
+
+
+.logform a:hover{
+    color: darkorange;
 }

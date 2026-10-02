@@ -6,22 +6,28 @@
 
 {% block content %}
 
-<h2>Вход</h2>
+<div class="logform">
+    <h2>Вход</h2>
 
-<form>
-    <label>
-        ЛОГИН:<input type="text" name="username">
-    </label>
+    <form>
+        <label>
+            ЛОГИН:<input type="text" name="username">
+        </label>
 
-    
+        
 
-    <label>
-        ПАРОЛЬ:<input type="password" name="password">
-    </label>
+        <label>
+            ПАРОЛЬ:<input type="password" name="password">
+        </label>
 
-    
+        
 
-    <button type="submit">ВОЙТИ</button>
-</form>
+        <button type="submit">ВОЙТИ</button>
+        <p>
+            Еще нет аккаунта?
+            <a href="/register">Зарегистрироваться</a>
+        </p>
+    </form>
+</div>
 
 {% endblock %}

@@ -5,29 +5,34 @@
 {% endblock %}
 
 {% block content %}
+<div class="logform">
+    <h2>Регистрация</h2>
 
-<h2>Регистрация</h2>
+    <form>
+        <label>
+            ЛОГИН:<input type="text" name="username">
+        </label>
 
-<form>
-    <label>
-        ЛОГИН:<input type="text" name="username">
-    </label>
+        
 
-    
+        <label>
+            ПОЧТА:<input type="email" name="email">
+        </label>
 
-    <label>
-        ПОЧТА:<input type="email" name="email">
-    </label>
+        
 
-    
+        <label>
+            ПАРОЛЬ:<input type="password" name="password">
+        </label>
 
-    <label>
-        ПАРОЛЬ:<input type="password" name="password">
-    </label>
+        
 
-    
-
-    <button type="submit">ЗАРЕГЕСТРИРОВАТЬСЯ</button>
-</form>
+        <button type="submit">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+        <p>
+            Уже есть аккаунт?
+            <a href="/login">Войти</a>
+        </p>
+    </form>
+</div>
 
 {% endblock %}
