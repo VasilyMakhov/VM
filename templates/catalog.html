@@ -1,27 +1,30 @@
 {% extends "base.html" %}
 
-{%block title %}
+{% block title %}
 Каталог - VM
 {% endblock %}
 
 {% block content %}
+
 <div class="cat-head">
     <h2>Каталог товаров</h2>
-    <p> Выберите товар который вам приглянулся</p>
+    <p>Выберите товар, который вам приглянулся</p>
 </div>
+
 <div class="products">
+
     {% for product in products %}
-
     <div class="product">
-        
-        <h3>{{product.name}}</h3>
-        <p>{{product.description}}</p>
-        <p class="price">{{product.price}} Р</p>
+        <img src="{{ product[3] }}" alt="{{ product[1] }}">
+        <h3>{{ product[1] }}</h3>
+        <p>{{ product[2] }}</p>
+        <p>Категория: {{ product[4] }}</p>
+        <p class="price">{{ product[5] }} Р</p>
+        <p>На складе: {{ product[6] }} шт.</p>
         <button>Подробнее</button>
-    </div>
 
+    </div>
     {% endfor %}
-    
 </div>
 
 {% endblock %}

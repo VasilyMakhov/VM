@@ -1,34 +1,48 @@
 from flask import Flask, render_template
+from firebird.driver import connect
 
 app = Flask(__name__)
+
+def get_connection():
+    return connect(
+    database="/db/wb_vasa.fdb",
+    user="SYSDBA",
+    password="masterkey"
+    )
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
-products = [
-    {
-        "name": "Беспроводные наушники",
-        "description": "Удобные беспроводные наушники для музыки и звонков.",
-        "price": 2999
-    },
-    {
-        "name": "Механическая клавиатура",
-        "description": "Клавиатура с механическими переключателями.",
-        "price": 4999
-    },
-    {
-        "name": "Игровая мышь",
-        "description": "Компьютерная мышь для игр и повседневной работы.",
-        "price": 1999
-    }
-]
-
-
+@app.route("/catalog")
 @app.route("/catalog")
 def catalog():
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    SELECT
+        p.ID,
+        p.NAME,
+        p.DESCRIPTION,
+        p.IMAGE_URL,
+        c.NAME AS CATEGORY,
+        sp.PRICE,
+        wp.QUANTITY
+    FROM PRODUCTS p
+    JOIN CATEGORIES c
+        ON c.ID = p.CATEGORY_ID
+    JOIN SELLER_PRODUCTS sp
+        ON sp.PRODUCT_ID = p.ID
+    JOIN WAREHOUSE_PRODUCTS wp
+        ON wp.SELLER_PRODUCT_ID = sp.ID
+""")
+
+    products = cursor.fetchall()
+    connection.close()
+
     return render_template("catalog.html", products=products)
+
 
 @app.route("/login")
 def login():
