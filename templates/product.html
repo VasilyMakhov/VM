@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{%block title %}
+{{ product[1] }} - VM
+{% endblock %}
+
+{% block content %}
+
+<h2><a href="/catalog"> Назад в каталог</a></h2>
+
+<div class="product-page">
+    <div class="product-img">
+        <img src="{{ product[3] }}" alt="{{ product[1] }}">
+    </div>
+        <div class="product-info">
+        <h2>{{ product[1] }}</h2>
+        <p>{{ product[2] }}</p>
+        <p>Категория: {{ product[4] }}</p>
+        <p class="price">{{ product[5] }} Р</p>
+        <p>На складе: {{ product[6] }} шт.</p>
+        <button>Добавить в корзину</button>
+    </div>
+</div>
+{% endblock %}
+
+
