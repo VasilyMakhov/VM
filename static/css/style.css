@@ -173,3 +173,12 @@ label{
     font-size: 24px;
     font-weight: bold;
 }
+
+.error {
+    background-color: lightgray;
+    color: red;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid red;
+    border-radius: 5px;
+}

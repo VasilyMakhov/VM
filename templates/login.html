@@ -8,10 +8,14 @@
 
 <div class="logform">
     <h2>Вход</h2>
-
-    <form>
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}  
+    <form method="post", action="{{ url_for('login') }}">
         <label>
-            ЛОГИН:<input type="text" name="username">
+            ЛОГИН:<input type="text" name="login">
         </label>
 
         

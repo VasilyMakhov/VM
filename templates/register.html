@@ -8,21 +8,38 @@
 <div class="logform">
     <h2>Регистрация</h2>
 
-    <form>
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}    
+
+    <form method="post" action="{{ url_for('register') }}">
         <label>
-            ЛОГИН:<input type="text" name="username">
+            ЛОГИН:<input type="text" name="login" required>
         </label>
 
         
 
         <label>
-            ПОЧТА:<input type="email" name="email">
+            ПОЧТА:<input type="email" name="email" required>
+        </label>
+
+
+
+        <label>
+            ИМЯ:<input type="text" name="first_name" required>
         </label>
 
         
 
         <label>
-            ПАРОЛЬ:<input type="password" name="password">
+            ФАМИЛИЯ:<input type="text" name="last_name" required>
+        </label>
+
+
+        <label>
+            ПАРОЛЬ:<input type="password" name="password" required>
         </label>
 
         
