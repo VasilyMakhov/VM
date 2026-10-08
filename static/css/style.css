@@ -174,11 +174,54 @@ label{
     font-weight: bold;
 }
 
-.error {
+.error{
     background-color: lightgray;
     color: red;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid red;
     border-radius: 5px;
+}
+
+.profile{
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 25px;
+    max-width: 600px;
+}
+
+.profile h2{
+    margin-top: 0;
+}
+
+.welcome-text{
+    font-size: 18px;
+}
+
+.profile-info{
+    margin-top: 20px;
+    border: 1px solid lightgray;
+    padding-top: 10px;
+}
+
+.profile-info p{
+    margin: 10px 0;
+}
+
+.profile-actions{
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.profile-actions a{
+    display: inline-block;
+    background-color: orangered;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+}
+
+.profile-actions a:hover{
+    background-color: orange;
 }

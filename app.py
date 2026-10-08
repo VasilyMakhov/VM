@@ -13,7 +13,29 @@ def get_connection():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    user = None;
+
+    if session.get("user_id"):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT
+            u.LOGIN,
+            u.EMAIL,
+            u.FIRST_NAME,
+            u.LAST_NAME,
+            r.NAME
+        FROM USERS u
+        JOIN ROLES r
+            ON r.ID = u.ROLE_ID
+        WHERE u.ID = ?
+        """, (session["user_id"],))
+
+        user = cursor.fetchone()
+        connection.close()
+
+    return render_template("index.html", user=user)
 
 @app.route("/catalog")
 def catalog():
@@ -25,7 +47,7 @@ def catalog():
         p.ID,
         p.NAME,
         p.IMAGE_URL,
-        sp.PRICE
+        p.PRICE
     FROM PRODUCTS p
     JOIN SELLER_PRODUCTS sp
         ON sp.PRODUCT_ID = p.ID
@@ -48,7 +70,7 @@ def product(product_id):
             p.DESCRIPTION,
             p.IMAGE_URL,
             c.NAME AS CATEGORY,
-            sp.PRICE,
+            p.PRICE,
             wp.QUANTITY
         FROM PRODUCTS p
         JOIN CATEGORIES c
@@ -124,7 +146,7 @@ def register():
             user = cursor.fetchone()
 
             if user is not None:
-                return render_template("register.html", error="Пользователь с таким именем или почтой уже существует =("), 400
+                return render_template("register.html", error="Пользователь с таким логином или почтой уже существует =("), 400
             
             cursor.execute("""
                 INSERT INTO USERS 
@@ -145,6 +167,11 @@ def register():
         return redirect(url_for("login"))
      
     return render_template("register.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(debug=1, port=2911)

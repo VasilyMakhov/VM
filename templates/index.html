@@ -5,20 +5,70 @@
 {% endblock %}
 
 {% block content %}
-<div class="welcome">
-<h2>Добро пожаловать в VM</h2>
-<p>
-    VM - Виртуальный Марктеплейс Василия Махова
-</p>
 
-<p>
-    Здесь можно найти товары, посмотреть их характеристики и оформить заказ.
-</p>
+{% if user %}
 
+<div class="profile">
 
-<a href="/catalog">
-    <button>Перейти в каталог</button>
-</a>
+    <h2>Личный кабинет</h2>
+
+    <p class="welcome-text">Добро пожаловать, {{ user[2] }}</p>
+
+    <div class="profile-info">
+
+        <p><strong> Логин:</strong>
+            {{ user[0] }}
+        </p>
+
+        <p><strong> Почта:</strong>
+            {{ user[1] }}
+        </p>
+
+        <p><strong> Имя:</strong>
+            {{ user[2] }}
+        </p>
+
+        <p><strong> Фамилия:</strong>
+            {{ user[3] }}
+        </p>
+
+        <p><strong> Роль:</strong>
+            {{ user[4] }}
+        </p>
+
+    </div>
+
+    <div class="profile-actions">
+        <a href="/catalog">Перейти в каталог</a>
+        <a href="/logout">Выйти</a>
+    </div>
 </div>
+
+{% else %}
+
+<div class="welcome">
+    <h2>Добро пожаловать в VM</h2>
+    <p>
+        VM - Виртуальный Марктеплейс Василия Махова
+    </p>
+
+    <p>
+        Здесь можно найти товары, посмотреть их характеристики и оформить заказ.
+    </p>
+
+    <p>
+        Что бы пользоваться всеми функциями сайта, войдите в аккаунт или зарегестрируйтесь.
+    </p>
+
+    <div class="profile-actions">
+
+        <a href="/login">Войти</a>
+        <a href="/register">Регистарция</a>
+        <a href="/catalog">Перейти в каталог</a>
+        
+    </div>
+</div>
+
+{% endif %}
 {% endblock %}
 
