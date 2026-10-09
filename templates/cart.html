@@ -30,7 +30,7 @@
 
             <form
                 id="selection-form"
-                action="{{ url_for('cart_select') }}"
+                action="{{ url_for('cart.cart_select') }}"
                 method="post">
                 <div class="cart-select-all">
 
@@ -116,7 +116,7 @@
 
                             <div class="quantity-block">
                                 <form
-                                    action="{{ url_for('cart_update', cart_id=item[0]) }}"
+                                    action="{{ url_for('cart.cart_update', cart_id=item[0]) }}"
                                     method="post">
                                     <input
                                         type="hidden"
@@ -135,7 +135,7 @@
                                 </span>
 
                                 <form
-                                    action="{{ url_for('cart_update', cart_id=item[0]) }}"
+                                    action="{{ url_for('cart.cart_update', cart_id=item[0]) }}"
                                     method="post">
                                 
                                     <input
@@ -157,7 +157,7 @@
                             </div>
 
                             <form
-                                action="{{ url_for('cart_remove', cart_id=item[0]) }}"
+                                action="{{ url_for('cart.cart_remove', cart_id=item[0]) }}"
                                 method="post">
                                 <button
                                     type="submit"
@@ -212,9 +212,8 @@
         </p>
 
         <a
-            href="{{ url_for('catalog') }}"
-            class="catalog-button"
-        >
+            href="{{ url_for('catalog.catalog') }}"
+            class="catalog-button">
             Перейти в каталог
         </a>
 

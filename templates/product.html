@@ -18,7 +18,7 @@
         <p>Категория: {{ product[4] }}</p>
         <p class="price">{{ product[5] }} Р</p>
         <p>На складе: {{ product[6] }} шт.</p>
-        <form action="{{ url_for('cart_add', product_id=product[0]) }}" method="post">
+        <form action="{{ url_for('cart.cart_add', product_id=product[0]) }}" method="post">
             <button type="submit">Добавить в корзину</button>
         </form>
     </div>

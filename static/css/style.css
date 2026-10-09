@@ -437,10 +437,15 @@ label{
 .catalog-button {
     display: inline-block;
     margin-top: 15px;
-    background-color: orange;
+    background-color: orangered;
     color: white;
     padding: 10px 18px;
     text-decoration: none;
+}
+
+.empty-cart a:hover{
+    background-color: darkorange;
+    color: white
 }
 
 .messages {
