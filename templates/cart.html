@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Корзина — VM{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    <h2>Каталог товаров</h2>
+    <p>Выберите товар, который вам приглянулся</p>
+</div>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+{% if items %}
+
+    <div class="cart-layout">
+
+        <div class="cart-main">
+
+            <form
+                id="selection-form"
+                action="{{ url_for('cart_select') }}"
+                method="post">
+                <div class="cart-select-all">
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="select_all"
+                            value="1"
+                            {% if items|length == selected_ids|length %}
+                                checked
+                            {% endif %}>
+                        Выбрать все
+                    </label>
+
+                    <span>
+                        Товаров в корзине: {{ items|length }}
+                    </span>
+
+                    <button
+                        type="submit"
+                        name="action"
+                        value="apply">
+                        Применить выбор
+                    </button>
+
+                    <button
+                        type="submit"
+                        name="action"
+                        value="clear">
+                        Снять выбор
+                    </button>
+
+                </div>
+            </form>
+
+            <div class="cart">
+
+                {% for item in items %}
+
+                    <div class="cart-item">
+
+                        <div class="cart-check-box">
+                            <input
+                                type="checkbox"
+                                form="selection-form"
+                                name="selected_items"
+                                value="{{ item[0] }}"
+                                class="cart-check"
+                                {% if item[0] in selected_ids %}
+                                    checked
+                                {% endif %}>
+                        </div>
+
+                        <div class="cart-image">
+                            {% if item[4] %}
+                                <img
+                                    src="{{ item[4] }}"
+                                    alt="{{ item[2] }}">
+                            {% else %}
+                                <div class="no-image">
+                                    Нет изображения
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-info">
+                            <h3>{{ item[2] }}</h3>
+
+                            <p class="cart-description">
+                                {{ item[3] or "Описание отсутствует" }}
+                            </p>
+
+                            <p class="cart-stock">
+                                На складе: {{ item[7] }} шт.
+                            </p>
+                        </div>
+
+                        <div class="cart-actions">
+
+                            <div class="cart-price">
+                                {{ item[5] }} ₽ / шт.
+                            </div>
+
+                            <div class="quantity-block">
+                                <form
+                                    action="{{ url_for('cart_update', cart_id=item[0]) }}"
+                                    method="post">
+                                    <input
+                                        type="hidden"
+                                        name="quantity"
+                                        value="{{ item[6] - 1 }}">
+
+                                    <button
+                                        type="submit"
+                                        class="quantity-button">
+                                        −
+                                    </button>
+                                </form>
+
+                                <span class="quantity">
+                                    {{ item[6] }}
+                                </span>
+
+                                <form
+                                    action="{{ url_for('cart_update', cart_id=item[0]) }}"
+                                    method="post">
+                                
+                                    <input
+                                        type="hidden"
+                                        name="quantity"
+                                        value="{{ item[6] + 1 }}">
+
+                                    <button
+                                        type="submit"
+                                        class="quantity-button">
+                                        +
+                                    </button>
+                                </form>
+
+                            </div>
+
+                            <div class="cart-item-total">
+                                {{ item[5] * item[6] }} ₽
+                            </div>
+
+                            <form
+                                action="{{ url_for('cart_remove', cart_id=item[0]) }}"
+                                method="post">
+                                <button
+                                    type="submit"
+                                    class="remove-button">
+                                    Удалить
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <div class="cart-summary">
+
+            <h3>Ваш заказ</h3>
+
+            <div class="summary-row">
+                <span>Выбрано штук:</span>
+                <span>{{ selected_count }}</span>
+            </div>
+
+            <div class="summary-total">
+                <span>Итого:</span>
+                <strong>{{ selected_total }} Р</strong>
+            </div>
+
+            <p class="summary-note">
+                В сумму входят только выбранные товары.
+                Чтобы изменить выбор, отметь нужные товары
+                и нажми «Применить выбор».
+            </p>
+
+        </div>
+
+    </div>
+
+{% else %}
+
+    <div class="empty-cart">
+
+        <h3>Корзина пока пуста</h3>
+
+        <p>
+            Перейди в каталог и добавь товары,
+            которые хочешь купить.
+        </p>
+
+        <a
+            href="{{ url_for('catalog') }}"
+            class="catalog-button"
+        >
+            Перейти в каталог
+        </a>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}
