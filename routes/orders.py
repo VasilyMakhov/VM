@@ -118,8 +118,10 @@ def checkout():
             connection.commit()
 
             session["cart_selected"] = []
+            if payment_method_id == "1":
+                return redirect(url_for("orders.sbp_payment", order_id=order_id))
             flash("Заказ успешно оформлен!", "success")
-            return redirect(url_for("cart.cart"))
+            return redirect(url_for("orders.my_orders"))
         except Exception as error:
             connection.rollback()
             flash("Не удалось оформить заказ", "error")
@@ -128,3 +130,105 @@ def checkout():
             connection.close()
 
     return render_template("checkout.html", items=items, total_price=total_price, payment_methods=payment_methods)
+
+@orders_bp.route("/payment/sbp/<int:order_id>")
+def sbp_payment(order_id):
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+            ID,
+            TOTAL_PRICE
+            FROM ORDERS
+            WHERE ID = ? AND USER_ID = ?
+        """, (order_id, session["user_id"]))
+
+        order = cursor.fetchone()
+
+    finally:
+        connection.close()
+
+    if not order[0]:
+        flash("Заказ не найден", "error")
+        return redirect(url_for("catalog.catalog"))
+    total_price = order[1]
+    return render_template("sbp_payment.html", order_id=order_id, total_price=total_price)
+
+@orders_bp.route("/payment/sbp/<int:order_id>/confirm", methods=["POST"])
+def confirm_payment(order_id):
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE ORDERS
+            SET PAYMENT_STATUS_ID = 2
+            WHERE ID = ?
+            AND USER_ID = ?
+            AND PAYMENT_METHOD_ID = 1
+        """, (order_id, session["user_id"]))
+
+        if cursor.rowcount == 0:
+            connection.rollback()
+            flash("Заказ не найден или оплата недоступна", "error")
+            return redirect(url_for("catalog.catalog"))
+
+        connection.commit()
+        flash("Заявка на оплату отправлена на проверку", "success")
+
+    except Exception as error:
+        connection.rollback()
+        print("Ошибка обновления оплаты:", error)
+        flash("Не удалось обновить статус оплаты", "error")
+        return redirect(url_for("catalog.catalog"))
+
+    finally:
+        connection.close()
+
+    return redirect(url_for("orders.my_orders"))
+
+@orders_bp.route("/my-orders")
+def my_orders():
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+            o.ID,
+            o.CREATED_AT,
+            o.TOTAL_PRICE,
+            os.NAME,
+            pm.NAME,
+            ps.NAME,
+            ds.NAME
+            FROM ORDERS o
+            JOIN ORDER_STATUSES os
+            ON os.ID = o.STATUS_ID
+            JOIN PAYMENT_METHODS pm
+            ON pm.ID = o.PAYMENT_METHOD_ID
+            JOIN PAYMENT_STATUSES ps
+            ON ps.ID = o.PAYMENT_STATUS_ID
+            JOIN DELIVERY_STATUSES ds
+            ON ds.ID = o.DELIVERY_STATUS_ID
+            WHERE o.USER_ID = ?
+            ORDER BY o.CREATED_AT DESC
+        """, (session["user_id"],))
+
+        orders = cursor.fetchall()
+
+    finally:
+        connection.close()
+
+    return render_template("my_orders.html", orders=orders)

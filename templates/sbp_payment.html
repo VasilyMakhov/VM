@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Оплата по СБП — VM{% endblock %}
+
+{% block content %}
+<div class="sbp-payment">
+    <div class="cat-head">
+        <h2>Оплата по СБП</h2>
+        <p>Заказ №{{ order_id }}</p>
+        <p>Сумма - {{ total_price }}</p>
+    
+
+    <div class="sbp-card">
+        <h3>Отсканируйте QR-код</h3>
+
+        <img src="{{ url_for('static', filename='images/QR.jpg') }}">
+
+        <p>После оплаты нажмите кнопку ниже.</p>
+
+        <form method="POST" action="{{ url_for('orders.confirm_payment', order_id=order_id) }}">
+            <button type="submit">Я оплатил, честно</button>
+        </form>
+    </div>
+    </div>
+</div>
+{% endblock %}
