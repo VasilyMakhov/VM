@@ -17,8 +17,8 @@
                 {% if session.get("user_id") %}
                     <a href="/">ЛК - {{ session.get("user_login") }} </a>
                     <a href="/catalog">Каталог</a>
-                    <a href="/logout">Выйти</a>
                     <a href="/cart">Корзина</a>
+                    <a href="/logout">Выйти</a>
                 {% else %}  
                     <a href="/">Главная</a>
                     <a href="/catalog">Каталог</a>
@@ -29,6 +29,17 @@
         </header>
 
         <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                        <div class="messages">
+                            {% for category, message in messages %}
+                                <div class="message {{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+            {% endwith %}
             {% block content %}{% endblock %}
         </main>
 

@@ -141,7 +141,7 @@ label{
 
 .product-page{
     background-color: white;
-    border: 1px solid gray;
+    border: 1px solid orangered;
     padding: 30px;
     margin-top: 20px;
     display: flex;
@@ -187,7 +187,7 @@ label{
     background-color: white;
     border: 1px solid orangered;
     padding: 25px;
-    max-width: 600px;
+    max-width: 6000px;
 }
 
 .profile h2{
@@ -460,4 +460,87 @@ label{
 
 .message.error {
     border-left: 4px solid crimson;
+}
+
+.message.success {
+    border-left: 4px solid limegreen;
+}
+
+.checkout {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.checkout-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.checkout-item {
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 15px 20px;
+}
+
+.checkout-item h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.checkout-item p {
+    margin: 8px 0;
+}
+
+.checkout-total {
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+}
+
+.checkout-total h2 {
+    margin: 0;
+}
+
+.checkout form {
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 20px;
+}
+
+.checkout .form-group {
+    margin-bottom: 20px;
+}
+
+.checkout label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.checkout textarea,
+.checkout select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid gray;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+.checkout textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.checkout textarea:focus,
+.checkout select:focus {
+    outline: 1px solid orangered;
+    border-color: orangered;
+}
+
+.checkout .profile-actions {
+    margin-top: 20px;
 }

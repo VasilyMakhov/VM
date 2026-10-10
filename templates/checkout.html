@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Оформление заказа — VM{% endblock %}
+
+{% block content %}
+
+<div class="checkout">
+    <div class="cat-head">
+        <h2>Оформление заказа</h2>
+        <p>Проверьте содержимое, выберите адрес и тип оплаты</p>
+    </div>
+
+    <div class="checkout-items">
+        {% for item in items %}
+            <div class="checkout-item">
+                <h3>{{ item[2] }}</h3>
+
+                <p>Цена: {{ "%.2f"|format(item[3]) }} ₽</p>
+                <p>Количество: {{ item[4] }}</p>
+
+                <p>
+                    Стоимость:
+                    {{ "%.2f"|format(item[3] * item[4]) }} ₽
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="checkout-total">
+        <h2>Итого: {{ "%.2f"|format(total_price) }} ₽</h2>
+    </div>
+
+    <form method="POST" action="{{ url_for('orders.checkout') }}">
+        <div class="form-group">
+            <label for="delivery_address">Адрес доставки</label>
+
+            <textarea
+                id="delivery_address"
+                name="delivery_address"
+                required
+                maxlength="500"
+                placeholder="Город, улица, дом, квартира"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="payment_method_id">Способ оплаты</label>
+
+            <select
+                id="payment_method_id"
+                name="payment_method_id"
+                required>
+                {% for method in payment_methods %}
+                    <option value="{{ method[0] }}">
+                        {{ method[1] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit">Подтвердить заказ</button>
+    </form>
+    <div class="profile-actions">
+    <a href="{{ url_for('cart.cart') }}">Вернуться в корзину</a>
+    </div>
+</div>
+{% endblock %}
