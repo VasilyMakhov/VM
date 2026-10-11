@@ -89,3 +89,95 @@ def register():
 def logout():
     session.clear()
     return redirect(url_for("main.index"))
+
+@auth_bp.route("/edit-profile", methods=["GET", "POST"])
+def edit_profile():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    user_id = session["user_id"]
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        if request.method == "POST":
+            login = request.form.get("login", "").strip()
+            email = request.form.get("email", "").strip()
+            first_name = request.form.get("first_name", "").strip()
+            last_name = request.form.get("last_name", "").strip()
+            password = request.form.get("password", "").strip()
+
+            if not login or not email or not first_name or not last_name:
+                return render_template("edit_profile.html", error="Заполните все обязательные поля"), 400
+
+            cursor.execute("""
+                SELECT ID
+                FROM USERS
+                WHERE (LOGIN = ? OR EMAIL = ?) AND ID <> ?
+            """, (login, email, user_id))
+
+            if cursor.fetchone() is not None:
+                cursor.execute("""
+                    SELECT 
+                    LOGIN, 
+                    EMAIL, 
+                    FIRST_NAME, 
+                    LAST_NAME
+                    FROM USERS
+                    WHERE ID = ?
+                """, (user_id,))
+                user = cursor.fetchone()
+
+                return render_template("edit_profile.html", user=user, error="Такой логин или почта уже заняты"), 400
+
+            if password:
+                cursor.execute("""
+                    UPDATE USERS
+                    SET LOGIN = ?, 
+                    EMAIL = ?, 
+                    FIRST_NAME = ?,
+                    LAST_NAME = ?, 
+                    PASSWORD = ?
+                    WHERE ID = ?
+                """, (login, email, first_name, last_name, password, user_id ))
+            else:
+                cursor.execute("""
+                    UPDATE USERS
+                    SET LOGIN = ?, 
+                    EMAIL = ?, 
+                    FIRST_NAME = ?,
+                    LAST_NAME = ?
+                    WHERE ID = ?
+                """, (login, email, first_name, last_name, user_id))
+
+            connection.commit()
+            session["user_login"] = login
+
+            return redirect(url_for("main.index"))
+
+        cursor.execute("""
+            SELECT 
+            LOGIN, 
+            EMAIL, 
+            FIRST_NAME, 
+            LAST_NAME, 
+            ROLE_ID
+            FROM USERS
+            WHERE ID = ?
+        """, (user_id,))
+
+        user = cursor.fetchone()
+
+        if user is None:
+            session.clear()
+            return redirect(url_for("auth.login"))
+
+        return render_template("edit_profile.html", user=user)
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()

@@ -223,7 +223,7 @@ label{
 }
 
 .profile-actions a:hover{
-    background-color: orange;
+    background-color: darkorange;
 }
 
 .cart-layout {
@@ -655,4 +655,36 @@ label{
 
 .filter-btn:hover {
     background-color: darkorange;
+}
+
+.logform input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid gray;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+    margin-bottom: 20px;
+    margin-top: 0px;
+}
+
+.logform input:focus{
+    outline: 1px solid orangered;
+    border-color: orangered;
+}
+
+
+.profile-link a{
+    margin-top: 20px;
+    display: inline-block;
+    background-color: orangered;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+}
+
+.profile-link a:hover{
+    background-color: darkorange;
+    color: white;
 }
