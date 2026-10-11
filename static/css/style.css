@@ -596,3 +596,63 @@ label{
 .sbp-payment button {
     margin-top: 10px;
 }
+
+
+.filter-form {
+    background-color: white;
+    border: 1px solid orangered;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 160px;
+}
+
+.filter-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #333;
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid gray;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: 1px solid orangered;
+    border-color: orangered;
+}
+
+
+.filter-btn {
+    background-color: orangered;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    height: 35px;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background-color: darkorange;
+}

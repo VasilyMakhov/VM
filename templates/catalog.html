@@ -11,6 +11,42 @@
     <p>Выберите товар, который вам приглянулся</p>
 </div>
 
+<form method="GET" action="{{ url_for('catalog.catalog') }}" class="filter-form">
+    
+    <div class="filter-group">
+        <label for="category">Категория:</label>
+        <select name="category" id="category">
+            <option value="">Все категории</option>
+            {% for category in categories %}
+            <option value="{{ category[0] }}" {% if selected_categoty == category[0]|string %}selected{% endif %}>
+                {{ category[1] }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <label for="search">Поиск:</label>
+        <input type="text" name="search" id="search" placeholder="Название товара" value="{{search}}">
+
+        <label for="min_price">Цена от:</label>
+        <input type="number" name="min_price" id="min_price" min="0" step="50" value="{{ min_price }}">
+ 
+        <label for="max_price">Цена до:</label>
+        <input type="number" name="max_price" id="max_price" min="0" step="50" value="{{ max_price }}">
+
+        <label for="sort">Сортировка:</label>
+        <select name="sort" id="sort">
+            <option value="" {% if sort == "" %}selected{% endif %}>По умолчанию</option>
+            <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Сначала дешёвые</option>
+            <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Сначала дорогие</option>
+            <option value="name" {% if sort == "name" %}selected{% endif %}>По алфавиту А-Б</option>
+        </select>
+    </div>
+
+    <button type="submit" class="filter-btn">Применить</button>
+</form>
+
+
+
 <div class="products">
 
     {% for product in products %}
