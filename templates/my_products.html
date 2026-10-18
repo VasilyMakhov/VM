@@ -21,12 +21,12 @@
 
     <div class="product">
 
-        <a href="{{ url_for('catalog.product', product_id=product[0]) }}">
+        <a href="{{ url_for('catalog.edit_product', product_id=product[0]) }}">
             <img src="{{ product[2] }}" alt="{{ product[1] }}">
         </a>
 
         <h3>
-            <a href="{{ url_for('catalog.product', product_id=product[0]) }}">
+            <a href="{{ url_for('catalog.edit_product', product_id=product[0]) }}">
                 {{ product[1] }}
             </a>
         </h3>
@@ -34,10 +34,10 @@
         <p class="price">{{ product[3] }} ₽</p>
 
         <a
-            href="{{ url_for('catalog.product', product_id=product[0]) }}"
+            href="{{ url_for('catalog.edit_product', product_id=product[0]) }}"
             class="edit-product-link"
         >
-            Посмотреть товар
+            Редактировать товар
         </a>
 
     </div>
@@ -47,9 +47,9 @@
 </div>
 
 {% if not products %}
-    <p class="empty-products">
+    <h3 class="empty-cart">
         Вы пока не добавили ни одного товара.
-    </p>
+    </h3>
 {% endif %}
 
 {% endblock %}

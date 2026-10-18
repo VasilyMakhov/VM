@@ -8,20 +8,39 @@
     <h2>Избранные товары</h2>
     <p>Посмотрите товары, которые вам приглянулись</p>
 </div>
-
-<div class="products">
-    {% for product in products %}
-    <div class="product">
-        <a href="/product/{{ product[0]}}">
-            <img src="{{ product[2] }}" alt="{{ product[1] }}">
-        </a>
-        <h3>
+{% if products %}
+    <div class="products">
+        {% for product in products %}
+        <div class="product">
             <a href="/product/{{ product[0]}}">
-                {{ product[1] }}
+                <img src="{{ product[2] }}" alt="{{ product[1] }}">
             </a>
-        </h3>
-        <p class="price">{{ product[3] }} Р</p>
+            <h3>
+                <a href="/product/{{ product[0]}}">
+                    {{ product[1] }}
+                </a>
+            </h3>
+            <p class="price">{{ product[3] }} Р</p>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
+{% else %}
+    <div class="empty-cart">
+
+        <h3>Ничего нету...</h3>
+
+        <p>
+            Перейди в каталог и добавь товары,
+            которые хочешь отметить.
+        </p>
+
+        <a
+            href="{{ url_for('catalog.catalog') }}"
+            class="catalog-button">
+            Перейти в каталог
+        </a>
+
+    </div>
+
+{% endif %}
 {% endblock %}
