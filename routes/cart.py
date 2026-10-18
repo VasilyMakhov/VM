@@ -74,6 +74,7 @@ def cart_add(product_id):
 
     finally:
         connection.close()
+    flash(f"Успешно добавлено! Товаров в корзине: {current_quantity + 1} шт.", "success")
     return redirect(url_for("catalog.product", product_id=product_id))
 
 @cart_bp.route("/cart")

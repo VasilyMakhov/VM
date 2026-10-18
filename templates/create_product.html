@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}
+Создание товара - VM
+{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    <h2>Создание товара</h2>
+    <p>Заполните информацию о товаре и укажите остатки на складах</p>
+</div>
+
+<div class="create-product-container">
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('catalog.create_product') }}"
+          class="create-product-form" enctype="multipart/form-data">
+
+        <label for="name">Название товара</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ request.form.get('name', '') }}"
+            required
+        >
+
+        <label for="category_id">Категория</label>
+        <select id="category_id" name="category_id" required>
+            <option value="">Выберите категорию</option>
+
+            {% for category in categories %}
+                <option
+                    value="{{ category[0] }}"
+                    {% if request.form.get('category_id') == category[0]|string %}selected{% endif %}
+                >
+                    {{ category[1] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="description">Описание</label>
+        <textarea
+            id="description"
+            name="description"
+            rows="5"
+            required
+        >{{ request.form.get('description', '') }}</textarea>
+
+        <label for="image">Изображение товара</label>
+        <input
+            type="file"
+            id="image"
+            name="image"
+            accept=".jpg,.jpeg,.png,.webp"
+            required
+        >
+
+        <label for="price">Цена, ₽</label>
+        <input
+            type="number"
+            id="price"
+            name="price"
+            min="0"
+            step="0.01"
+            value="{{ request.form.get('price', '') }}"
+            required
+        >
+
+        <h3>Количество на складах</h3>
+
+        {% if warehouses %}
+            {% for warehouse in warehouses %}
+
+                <div class="warehouse-quantity">
+                    <label for="quantity_{{ warehouse[0] }}">
+                        {{ warehouse[1] }}
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quantity_{{ warehouse[0] }}"
+                        name="quantity_{{ warehouse[0] }}"
+                        min="0"
+                        step="1"
+                        value="{{ request.form.get('quantity_' ~ warehouse[0]|string, '0') }}"
+                        required
+                    >
+                </div>
+
+            {% endfor %}
+        {% else %}
+            <p>В базе пока нет складов. Обратитесь к модератору.</p>
+        {% endif %}
+
+        <button type="submit" class="filter-btn">
+            Создать товар
+        </button>
+
+        <a href="{{ url_for('catalog.my_products') }}" class="cancel-product-link">
+            Отмена
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

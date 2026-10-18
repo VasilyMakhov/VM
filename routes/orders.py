@@ -101,19 +101,83 @@ def checkout():
             order_id = cursor.fetchone()[0]
 
             for item in items:
-                cursor.execute("""
-                    INSERT INTO ORDER_ITEMS (
-                    ORDER_ID,
-                    QUANTITY,
-                    PRICE,
-                    SELLER_PRODUCT_ID)
-                    VALUES (?, ?, ?, ?)
-                """, (order_id, item[4], item[3], item[5]))
+                seller_product_id = item[5]
+                order_quantity = item[4]
 
                 cursor.execute("""
-                    DELETE FROM CART_ITEMS
-                    WHERE ID = ? AND USER_ID = ?
-                """, (item[0], session["user_id"]))
+                    SELECT
+                        ID,
+                        QUANTITY
+                    FROM WAREHOUSE_PRODUCTS
+                    WHERE SELLER_PRODUCT_ID = ?
+                    AND QUANTITY > 0
+                    ORDER BY WAREHOUSE_ID
+                """, (seller_product_id,))
+
+                warehouse_stock = cursor.fetchall()
+
+                total_stock = sum(
+                    warehouse[1]
+                    for warehouse in warehouse_stock
+                )
+
+                if total_stock < order_quantity:
+                    connection.rollback()
+                    flash(
+                        f"Недостаточно товара «{item[2]}» на складах",
+                        "error"
+                    )
+                    return redirect(url_for("cart.cart"))
+
+                remaining_quantity = order_quantity
+
+                for warehouse in warehouse_stock:
+                    if remaining_quantity == 0:
+                        break
+
+                    warehouse_id = warehouse[0]
+                    warehouse_quantity = warehouse[1]
+
+                    quantity_to_remove = min(
+                        warehouse_quantity,
+                        remaining_quantity
+                    )
+
+                    cursor.execute("""
+                        UPDATE WAREHOUSE_PRODUCTS
+                        SET QUANTITY = QUANTITY - ?
+                        WHERE ID = ?
+                        AND QUANTITY >= ?
+                    """, (
+                        quantity_to_remove,
+                        warehouse_id,
+                        quantity_to_remove
+                    ))
+
+                    if cursor.rowcount != 1:
+                        raise Exception("Не удалось обновить остаток товара")
+
+                    remaining_quantity -= quantity_to_remove
+
+                    cursor.execute("""
+                        INSERT INTO ORDER_ITEMS (
+                            ORDER_ID,
+                            QUANTITY,
+                            PRICE,
+                            SELLER_PRODUCT_ID
+                        )
+                        VALUES (?, ?, ?, ?)
+                    """, (
+                        order_id,
+                        order_quantity,
+                        item[3],
+                        seller_product_id
+                    ))
+
+                    cursor.execute("""
+                        DELETE FROM CART_ITEMS
+                        WHERE ID = ? AND USER_ID = ?
+                    """, (item[0], session["user_id"]))
 
             connection.commit()
 

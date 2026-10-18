@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}
+Мои товары - VM
+{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    <h2>Мои товары</h2>
+    <p>Здесь находятся товары, которые вы добавили на VM</p>
+</div>
+
+
+<a href="{{ url_for('catalog.create_product') }}" class="add-product"> Добавить новый товар </a>
+
+
+<div class="products">
+
+    {% for product in products %}
+
+    <div class="product">
+
+        <a href="{{ url_for('catalog.product', product_id=product[0]) }}">
+            <img src="{{ product[2] }}" alt="{{ product[1] }}">
+        </a>
+
+        <h3>
+            <a href="{{ url_for('catalog.product', product_id=product[0]) }}">
+                {{ product[1] }}
+            </a>
+        </h3>
+
+        <p class="price">{{ product[3] }} ₽</p>
+
+        <a
+            href="{{ url_for('catalog.product', product_id=product[0]) }}"
+            class="edit-product-link"
+        >
+            Посмотреть товар
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% if not products %}
+    <p class="empty-products">
+        Вы пока не добавили ни одного товара.
+    </p>
+{% endif %}
+
+{% endblock %}

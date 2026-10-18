@@ -38,7 +38,7 @@
             <option value="" {% if sort == "" %}selected{% endif %}>По умолчанию</option>
             <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Сначала дешёвые</option>
             <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Сначала дорогие</option>
-            <option value="name" {% if sort == "name" %}selected{% endif %}>По алфавиту А-Б</option>
+            <option value="name" {% if sort == "name" %}selected{% endif %}>По алфавиту А-Я</option>
         </select>
     </div>
 
@@ -51,7 +51,7 @@
 
     {% for product in products %}
     <div class="product">
-        <a href="/product/{{ product[0]}}">
+        <a href="/product/{{ product[0] }}">
             <img src="{{ product[2] }}" alt="{{ product[1] }}">
         </a>
         <h3>

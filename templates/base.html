@@ -16,7 +16,11 @@
             <nav>
                 {% if session.get("user_id") %}
                     <a href="/">ЛК - {{ session.get("user_login") }} </a>
+                    {% if session.get("user_role") == 2 %}
+                        <a href="{{ url_for('catalog.my_products') }}"> Мои товары </a>
+                    {% endif %}   
                     <a href="/catalog">Каталог</a>
+                    <a href="/favorites">Избранное</a>
                     <a href="/cart">Корзина</a>
                     <a href="/my-orders">Мои заказы</a>
                     <a href="/logout">Выйти</a>

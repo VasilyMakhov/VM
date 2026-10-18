@@ -46,9 +46,15 @@ def register():
         password = request.form.get("password", "").strip() 
         first_name = request.form.get("first_name", "").strip() 
         last_name = request.form.get("last_name", "").strip()     
+        role_id = request.form.get("role_id", "1").strip()
+
+        print("ROLE ID --- ", repr(role_id) )
 
         if not login or not email or not password or not first_name or not last_name:
             return render_template("register.html", error="Заполните все поля"), 400
+
+        if role_id not in ("1","2"):
+            return render_template("register.html", error="Выбрана недопустимая роль"), 400
 
         connection = get_connection()
         cursor = connection.cursor()
@@ -70,7 +76,7 @@ def register():
                 (LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
                 VALUES 
                 (?, ?, ?, ?, ?, ?)
-            """, (login, email, password, first_name, last_name, 1))
+            """, (login, email, password, first_name, last_name, int(role_id)))
 
             connection.commit()
         
