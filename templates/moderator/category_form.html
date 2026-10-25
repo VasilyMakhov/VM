@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if category %}Редактирование категории{% else %}Добавление категории{% endif %} - VM
+{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    {% if category %}
+        <h2>Редактирование категории</h2>
+        <p>Измените название и описание категории</p>
+    {% else %}
+        <h2>Добавление категории</h2>
+        <p>Укажите название и описание новой категории</p>
+    {% endif %}
+</div>
+
+<div class="create-product-container">
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST"
+          action="{% if category %}{{ url_for('moderator.category_edit', cat_id=category[0]) }}{% else %}{{ url_for('moderator.category_add') }}{% endif %}"
+          class="create-product-form">
+
+        <label for="name">Название категории</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ request.form.get('name', category[1] if category else '') }}"
+            required
+        >
+
+        <label for="description">Описание категории</label>
+        <textarea
+            id="description"
+            name="description"
+            rows="4"
+            required
+        >{{ request.form.get('description', category[2] if category else '') }}</textarea>
+
+        <button type="submit">
+            {% if category %}Сохранить{% else %}Добавить категорию{% endif %}
+        </button>
+
+        <a href="{{ url_for('moderator.categories_list') }}" class="cancel-product-link">
+            Отмена
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

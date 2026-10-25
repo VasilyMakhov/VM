@@ -811,3 +811,41 @@ label{
 .danger-btn:hover {
     background-color: red;
 }
+
+.moderator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.moderator-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid orangered;
+    background-color: white;
+    border-radius: 6px;
+}
+
+.moderator-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-form {
+    display: inline;
+}
+
+.moderator-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.moderator-item-text {
+    font-size: 14px;
+    color: gray;
+}

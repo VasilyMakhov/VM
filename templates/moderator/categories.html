@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}
+Категории - панель модератора - VM
+{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    <h2>Управление категориями</h2>
+    <p>Добавляйте, изменяйте и удаляйте категории товаров</p>
+</div>
+
+<div class="create-product-container">
+
+    <a href="{{ url_for('moderator.category_add') }}">
+        Добавить категорию
+    </a>
+
+    {% if categories %}
+        <div class="moderator-list">
+            {% for category in categories %}
+                <div class="moderator-item">
+                    <div class="moderator-item-info">
+                        <span class="moderator-item-name">{{ category[1] }}</span>
+                        <span class="moderator-item-text">{{ category[2] }}</span>
+                    </div>
+
+                    <div class="moderator-actions">
+                        <a href="{{ url_for('moderator.category_edit', cat_id=category[0]) }}" class="cancel-product-link">
+                            Изменить
+                        </a>
+
+                        <form method="POST"
+                              action="{{ url_for('moderator.category_delete', cat_id=category[0]) }}"
+                              class="delete-form">
+                            <button type="submit">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>В базе пока нет категорий.</p>
+    {% endif %}
+
+    <a href="{{ url_for('moderator.warehouses_list') }}" class="cancel-product-link">
+        К складам
+    </a>
+
+</div>
+
+{% endblock %}

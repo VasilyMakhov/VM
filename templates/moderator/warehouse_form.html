@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if warehouse %}Редактирование склада{% else %}Добавление склада{% endif %} - VM
+{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    {% if warehouse %}
+        <h2>Редактирование склада</h2>
+        <p>Измените название и адрес склада</p>
+    {% else %}
+        <h2>Добавление склада</h2>
+        <p>Укажите название и адрес нового склада</p>
+    {% endif %}
+</div>
+
+<div class="create-product-container">
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST"
+          action="{% if warehouse %}{{ url_for('moderator.warehouse_edit', wh_id=warehouse[0]) }}{% else %}{{ url_for('moderator.warehouse_add') }}{% endif %}"
+          class="create-product-form">
+
+        <label for="name">Название склада</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ request.form.get('name', warehouse[1] if warehouse else '') }}"
+            required
+        >
+
+        <label for="address">Адрес склада</label>
+        <input
+            type="text"
+            id="address"
+            name="address"
+            value="{{ request.form.get('address', warehouse[2] if warehouse else '') }}"
+            required
+        >
+
+        <button type="submit">
+            {% if warehouse %}Сохранить{% else %}Добавить склад{% endif %}
+        </button>
+
+        <a href="{{ url_for('moderator.warehouses_list') }}" class="cancel-product-link">
+            Отмена
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}
+Склады - панель модератора - VM
+{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    <h2>Управление складами</h2>
+    <p>Добавляйте, изменяйте и удаляйте склады хранения</p>
+</div>
+
+<div class="create-product-container">
+
+    <a href="{{ url_for('moderator.warehouse_add') }}" >
+        Добавить склад
+    </a>
+
+    {% if warehouses %}
+        <div class="moderator-list">
+            {% for warehouse in warehouses %}
+                <div class="moderator-item">
+                    <div class="moderator-item-info">
+                        <span class="moderator-item-name">{{ warehouse[1] }}</span>
+                        <span class="moderator-item-text">{{ warehouse[2] }}</span>
+                    </div>
+
+                    <div class="moderator-actions">
+                        <a href="{{ url_for('moderator.warehouse_edit', wh_id=warehouse[0]) }}" class="cancel-product-link">
+                            Изменить
+                        </a>
+
+                        <form method="POST"
+                              action="{{ url_for('moderator.warehouse_delete', wh_id=warehouse[0]) }}"
+                              class="delete-form">
+                            <button type="submit">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>В базе пока нет складов.</p>
+    {% endif %}
+
+    <a href="{{ url_for('moderator.categories_list') }}" class="cancel-product-link">
+        К категориям
+    </a>
+
+</div>
+
+{% endblock %}

@@ -19,6 +19,9 @@
                     {% if session.get("user_role") == 2 %}
                         <a href="{{ url_for('catalog.my_products') }}"> Мои товары </a>
                     {% endif %}   
+                    {% if session.get("user_role") == 3 %}
+                        <a href="{{ url_for('moderator.categories_list') }}"> Панель модератора </a>
+                    {% endif %}
                     <a href="/catalog">Каталог</a>
                     <a href="/favorites">Избранное</a>
                     <a href="/cart">Корзина</a>
