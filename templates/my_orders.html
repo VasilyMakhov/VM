@@ -21,6 +21,12 @@
                     <p>Способ оплаты: {{ order[4] }}</p>
                     <p>Статус оплаты: {{ order[5] }}</p>
                     <p>Доставка: {{ order[6] }}</p>
+                    {% if order[7] == 4 and order[8] == 2 %}
+                        <form method="POST"
+                            action="{{ url_for('orders.confirm_receipt', order_id=order[0]) }}">
+                            <button type="submit">Подтвердить получение</button>
+                        </form>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

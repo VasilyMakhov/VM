@@ -100,6 +100,30 @@ def checkout():
 
             order_id = cursor.fetchone()[0]
 
+            seller_ids = set()
+
+            for item in items:
+                cursor.execute("""
+                    SELECT SELLER_ID
+                    FROM SELLER_PRODUCTS
+                    WHERE ID = ?
+                """, (item[5],))
+
+                seller = cursor.fetchone()
+
+                if seller is not None:
+                    seller_ids.add(seller[0])
+
+            for seller_id in seller_ids:
+                cursor.execute("""
+                    INSERT INTO ORDER_SELLERS (
+                        ORDER_ID,
+                        SELLER_ID
+                    )
+                    VALUES (?, ?)
+                """, (order_id, seller_id))
+
+
             for item in items:
                 seller_product_id = item[5]
                 order_quantity = item[4]
@@ -128,7 +152,6 @@ def checkout():
                         "error"
                     )
                     return redirect(url_for("cart.cart"))
-
                 remaining_quantity = order_quantity
 
                 for warehouse in warehouse_stock:
@@ -159,25 +182,28 @@ def checkout():
 
                     remaining_quantity -= quantity_to_remove
 
-                    cursor.execute("""
-                        INSERT INTO ORDER_ITEMS (
-                            ORDER_ID,
-                            QUANTITY,
-                            PRICE,
-                            SELLER_PRODUCT_ID
-                        )
-                        VALUES (?, ?, ?, ?)
-                    """, (
-                        order_id,
-                        order_quantity,
-                        item[3],
-                        seller_product_id
-                    ))
+                if remaining_quantity != 0:
+                    raise Exception("Не удалось полностью зарезервировать товар")
 
-                    cursor.execute("""
-                        DELETE FROM CART_ITEMS
-                        WHERE ID = ? AND USER_ID = ?
-                    """, (item[0], session["user_id"]))
+                cursor.execute("""
+                    INSERT INTO ORDER_ITEMS (
+                        ORDER_ID,
+                        QUANTITY,
+                        PRICE,
+                        SELLER_PRODUCT_ID
+                    )
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    order_id,
+                    order_quantity,
+                    item[3],
+                    seller_product_id
+                ))
+
+                cursor.execute("""
+                    DELETE FROM CART_ITEMS
+                    WHERE ID = ? AND USER_ID = ?
+                """, (item[0], session["user_id"]))
 
             connection.commit()
 
@@ -217,7 +243,7 @@ def sbp_payment(order_id):
     finally:
         connection.close()
 
-    if not order[0]:
+    if order is None:
         flash("Заказ не найден", "error")
         return redirect(url_for("catalog.catalog"))
     total_price = order[1]
@@ -276,7 +302,9 @@ def my_orders():
             os.NAME,
             pm.NAME,
             ps.NAME,
-            ds.NAME
+            ds.NAME,
+            o.STATUS_ID,
+            o.DELIVERY_STATUS_ID
             FROM ORDERS o
             JOIN ORDER_STATUSES os
             ON os.ID = o.STATUS_ID
@@ -296,3 +324,70 @@ def my_orders():
         connection.close()
 
     return render_template("my_orders.html", orders=orders)
+
+@orders_bp.route("/orders/<int:order_id>/confirm-receipt", methods=["POST"])
+def confirm_receipt(order_id):
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                PAYMENT_METHOD_ID,
+                STATUS_ID,
+                DELIVERY_STATUS_ID
+            FROM ORDERS
+            WHERE ID = ?
+              AND USER_ID = ?
+        """, (order_id, session["user_id"]))
+
+        order = cursor.fetchone()
+
+        if order is None:
+            flash("Заказ не найден.", "error")
+            return redirect(url_for("orders.my_orders"))
+
+        payment_method_id = order[0]
+        status_id = order[1]
+        delivery_status_id = order[2]
+
+        if status_id != 4 or delivery_status_id != 2:
+            flash("Этот заказ ещё не передан в доставку.", "error")
+            return redirect(url_for("orders.my_orders"))
+
+        cursor.execute("""
+            UPDATE ORDERS
+            SET
+                STATUS_ID = 5,
+                DELIVERY_STATUS_ID = 3,
+                PAYMENT_STATUS_ID = CASE
+                    WHEN PAYMENT_METHOD_ID = 2 THEN 3
+                    ELSE PAYMENT_STATUS_ID
+                END
+            WHERE ID = ?
+              AND USER_ID = ?
+              AND STATUS_ID = 4
+              AND DELIVERY_STATUS_ID = 2
+        """, (order_id, session["user_id"]))
+
+        if cursor.rowcount != 1:
+            connection.rollback()
+            flash("Не удалось подтвердить получение заказа.", "error")
+            return redirect(url_for("orders.my_orders"))
+
+        connection.commit()
+
+        flash("Получение заказа подтверждено!", "success")
+
+    except Exception as error:
+        connection.rollback()
+        print("Ошибка подтверждения получения:", error)
+        flash("Не удалось подтвердить получение заказа.", "error")
+
+    finally:
+        connection.close()
+
+    return redirect(url_for("orders.my_orders"))

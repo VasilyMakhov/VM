@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Заказы продавца — VM{% endblock %}
+
+{% block content %}
+
+<div class="cat-head">
+    <h2>Заказы продавца</h2>
+    <p>Заказы, в которых есть ваши товары</p>
+</div>
+
+<div class="my-orders">
+    {% if orders %}
+        <div class="orders-list">
+
+            {% for order in orders %}
+                <div class="order-card">
+
+                    <h3>Заказ №{{ order.id }}</h3>
+
+                    <p>
+                        Дата:
+                        {{ order.created_at.strftime("%d.%m.%Y %H:%M") }}
+                    </p>
+
+                    <p>Покупатель: {{ order.buyer_login }}</p>
+                    <p>Адрес доставки: {{ order.delivery_address }}</p>
+
+                    <hr>
+
+                    <h4>Ваши товары</h4>
+
+                    {% for item in order["items"] %}
+                        <p>
+                            {{ item.name }} —
+                            {{ item.quantity }} шт. ×
+                            {{ "%.2f"|format(item.price) }} ₽
+                        </p>
+                    {% endfor %}
+
+                    <p>
+                        <b>
+                            Сумма ваших товаров:
+                            {{ "%.2f"|format(order.seller_total) }} ₽
+                        </b>
+                    </p>
+
+                    <hr>
+
+                    <p>Статус заказа: {{ order.order_status }}</p>
+                    <p>Оплата: {{ order.payment_method }}</p>
+                    <p>Статус оплаты: {{ order.payment_status }}</p>
+                    <p>Статус доставки: {{ order.delivery_status }}</p>
+
+                    {% if order.payment_method_id == 1
+                        and order.payment_status_id == 2
+                        and not order.payment_confirmed
+                        and order.status_id not in (4, 5, 6) %}
+
+                        <form method="POST"
+                            action="{{ url_for('catalog.seller_confirm_payment', order_id=order.id) }}">
+                            <button type="submit">Подтвердить оплату</button>
+                        </form>
+
+                    {% endif %}
+
+
+                    {% if not order.handed_to_delivery
+                        and order.status_id not in (5, 6)
+                        and order.delivery_status_id not in (3, 4) %}
+
+                        <form method="POST"
+                            action="{{ url_for('catalog.seller_handover', order_id=order.id) }}">
+                            <button type="submit">Передать в доставку</button>
+                        </form>
+
+                    {% endif %}
+
+                    <p>
+                        Подтверждение оплаты вами:
+                        {% if order.payment_confirmed %}
+                            Подтверждено
+                        {% else %}
+                            Ожидает подтверждения
+                        {% endif %}
+                    </p>
+
+                    <p>
+                        Передача в доставку:
+                        {% if order.handed_to_delivery %}
+                            Выполнена
+                        {% else %}
+                            Не выполнена
+                        {% endif %}
+                    </p>
+
+                </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <div class="order-card">
+            <p>Заказов с вашими товарами пока нет.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
