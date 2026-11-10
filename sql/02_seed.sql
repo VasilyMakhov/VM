@@ -1,0 +1,406 @@
+-- ============================================================
+-- VM² — тестовые данные
+-- ============================================================
+-- Запускать после sql/01_schema.sql на пустой базе.
+--
+--   isql-fb -q -ch UTF8 -u SYSDBA -p masterkey /db/wb_vasa.fdb -i sql/02_seed.sql
+--
+-- Скрипт вставляет данные с явными ID, чтобы ссылки между
+-- таблицами были предсказуемыми. После вставки генераторы
+-- переводятся на максимальные значения.
+-- ============================================================
+
+SET SQL DIALECT 3;
+SET NAMES UTF8;
+
+-- ------------------------------------------------------------
+-- Роли
+-- ------------------------------------------------------------
+INSERT INTO ROLES (ID, NAME) VALUES (1, 'Пользователь');
+INSERT INTO ROLES (ID, NAME) VALUES (2, 'Продавец');
+INSERT INTO ROLES (ID, NAME) VALUES (3, 'Модератор');
+
+-- ------------------------------------------------------------
+-- Статусы заказа
+-- ------------------------------------------------------------
+INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (1, 'Новый');
+INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (2, 'Подтверждён');
+INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (3, 'Собирается');
+INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (4, 'Передан в доставку');
+INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (5, 'Доставлен');
+INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (6, 'Отменён');
+
+-- ------------------------------------------------------------
+-- Способы оплаты
+-- ------------------------------------------------------------
+INSERT INTO PAYMENT_METHODS (ID, NAME) VALUES (1, 'СБП');
+INSERT INTO PAYMENT_METHODS (ID, NAME) VALUES (2, 'При получении');
+
+-- ------------------------------------------------------------
+-- Статусы оплаты
+-- ------------------------------------------------------------
+INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (1, 'Ожидает оплаты');
+INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (2, 'Ожидает проверки');
+INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (3, 'Оплачено');
+INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (4, 'Отклонено');
+
+-- ------------------------------------------------------------
+-- Статусы доставки
+-- ------------------------------------------------------------
+INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (1, 'Не отправлен');
+INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (2, 'В пути');
+INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (3, 'Доставлен');
+INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (4, 'Отменён');
+
+-- ------------------------------------------------------------
+-- Пользователи
+-- ------------------------------------------------------------
+INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
+VALUES (1, 'testuser', 'user@vm.ru', '123456', 'Иван', 'Покупатель', 1);
+
+INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
+VALUES (2, 'seller1', 'seller@vm.ru', '123456', 'Пётр', 'Продавец', 2);
+
+INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
+VALUES (3, 'moderator', 'moderator@vm.ru', '123456', 'Василий', 'Махов', 3);
+
+INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
+VALUES (4, '$eller', 'cash@vm.ru', 'qqqwww123', 'Изя', 'Янкелевич', 2);
+
+INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
+VALUES (5, 'prodavan228', 'money@more.ru', '123456', 'Никита', 'Чернов', 2);
+
+INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
+VALUES (6, 'buyer2', 'buyer2@vm.ru', '123456', 'Данила', 'Кочетов', 1);
+
+-- ------------------------------------------------------------
+-- Категории
+-- ------------------------------------------------------------
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (1, 'Электроника', 'Электронные устройства и аксессуары');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (2, 'Одежда', 'Одежда и аксессуары');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (3, 'Для дома', 'Товары для дома');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (4, 'Обувь', 'Кроссовки, ботинки и другая обувь');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (5, 'Аксессуары', 'Рюкзаки, сумки, ремни и другие аксессуары');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (6, 'Кухня', 'Посуда, столовые приборы и кухонные принадлежности');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (7, 'Бытовая техника', 'Пылесосы, чайники, утюги и бытовые приборы');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (8, 'Красота и уход', 'Фены и товары для ухода за собой');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (9, 'Спорт и отдых', 'Спортивный инвентарь и товары для отдыха');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (10, 'Игрушки и игры', 'Игрушки, настольные игры и товары для досуга');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (11, 'Книги и канцелярия', 'Книги, тетради, ручки и канцелярские товары');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (12, 'Автотовары', 'Автоаксессуары и товары для автомобилей');
+
+INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
+    (13, 'Товары для животных', 'Кормушки, миски, игрушки и аксессуары для животных');
+
+-- ------------------------------------------------------------
+-- Склады
+-- ------------------------------------------------------------
+INSERT INTO WAREHOUSES (ID, NAME, ADDRESS) VALUES
+    (1, 'Основной склад', 'г. Москва, ул. Центральная, д. 10');
+
+INSERT INTO WAREHOUSES (ID, NAME, ADDRESS) VALUES
+    (2, 'Склад N17', 'г. Санкт-Петербург, ул. Калинина, д. 12');
+
+INSERT INTO WAREHOUSES (ID, NAME, ADDRESS) VALUES
+    (3, 'Склад N29', 'г. Самара, ул. Куйбышева, д. 33');
+
+-- ------------------------------------------------------------
+-- Товары
+-- ------------------------------------------------------------
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (1, 1, 'Беспроводные наушники',
+        'Беспроводные наушники с Bluetooth, плотно сидят и хорошо передают звук.',
+        '/static/images/headphones.jpg', 4999.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (2, 1, 'Механическая клавиатура',
+        'Механическая клавиатура с приятным ходом клавиш для работы и игр.',
+        '/static/images/keyboard.jpg', 7999.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (3, 2, 'Футболка',
+        'Хлопковая футболка свободного кроя на каждый день.',
+        '/static/images/tshirt.jpg', 1999.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (4, 3, 'Настольная лампа',
+        'Настольная лампа с регулируемой яркостью для рабочего стола.',
+        '/static/images/lamp.jpg', 2999.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (5, 2, 'Утеплённый бомбер с капюшоном',
+        'Тёплый мужской бомбер с капюшоном и карабинами. Подходит для осени и мягкой зимы.',
+        '/static/images/fc3c998e6540494991aa038864758d2e.jpg', 11598.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (6, 10, 'Мягкая игрушка «сиамский кот» 25 см',
+        'Мягкая плюшевая игрушка «сиамский кот» высотой 25 см.',
+        '/static/images/897606f4c90341d289a2726b1c2a5435.jpg', 620.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (7, 13, 'Сухой корм для котят «Курица и лосось» 2 кг',
+        'Сухой корм для котят с курицей и лососем, 2 кг.',
+        '/static/images/4aa0f7880c9e42ceb14cbc75b7155b5a.webp', 1259.60);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (8, 10, 'Поющая рыба',
+        'Музыкальный сувенир «поющая рыба» с датчиком движения.',
+        '/static/images/bfb8d3ab8e7f44169e713b56cfc0b133.webp', 2999.99);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (9, 11, 'Планировщик бюджета с конвертами',
+        'Планировщик бюджета с конвертами для денег и наклейками.',
+        '/static/images/82165497d8964131954f7ba3e56775db.webp', 758.12);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (10, 12, 'Подарочный набор автохимии',
+        'Подарочный набор автохимии из четырёх предметов для ухода за автомобилем.',
+        '/static/images/1b95cbb01f254ee4891283b59236826d.webp', 536.88);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (11, 8, 'Маска для лица антивозрастная',
+        'Антивозрастная увлажняющая маска для лица.',
+        '/static/images/4deeb0be1aa9490c95919303e30bc6d6.webp', 681.89);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (12, 6, 'Стол кухонный обеденный раздвижной',
+        'Кухонный обеденный стол, раздвижной, цвет «белый мрамор».',
+        '/static/images/26f8d694a4ee4a7183679859bc34b246.webp', 5064.11);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (13, 5, 'Часы кварцевые с браслетом',
+        'Кварцевые часы с металлическим браслетом.',
+        '/static/images/448cb6816fa143f4adc0a8f5ec1d4a12.webp', 1420.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (14, 7, 'Телевизор 32" Full HD Smart TV',
+        'Телевизор 32 дюйма, Full HD, Smart TV.',
+        '/static/images/eb499cb3989a49e9a9e10671657dd7e3.webp', 15975.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (15, 9, 'Мяч футбольный размер 5',
+        'Футбольный мяч размера 5 для тренировок и игр.',
+        '/static/images/978e29e3a3a84edca5fe1f5c6cd811a3.webp', 1699.00);
+
+INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
+VALUES (16, 4, 'Кроссовки Adidas x Jeremy Scott Wings 2.0',
+        'Кроссовки Adidas x Jeremy Scott Wings 2.0 USA Flag.',
+        '/static/images/2ce998b7bf73438c8893947ea4eb4133.webp', 6244.00);
+
+-- ------------------------------------------------------------
+-- Предложения продавцов
+-- seller1 (ID 2)       → товары 1–7
+-- $eller (ID 4)        → товары 8–10, 13–15
+-- prodavan228 (ID 5)   → товары 11, 12, 16
+-- ------------------------------------------------------------
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (1, 2, 1);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (2, 2, 2);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (3, 2, 3);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (4, 2, 4);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (5, 2, 5);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (6, 2, 6);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (7, 2, 7);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (8, 4, 8);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (9, 4, 9);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (10, 4, 10);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (11, 5, 11);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (12, 5, 12);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (13, 4, 13);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (14, 4, 14);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (15, 4, 15);
+INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (16, 5, 16);
+
+-- ------------------------------------------------------------
+-- Остатки на складах
+-- ------------------------------------------------------------
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (1, 1, 1, 15);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (2, 2, 1, 3);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (3, 1, 2, 8);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (4, 1, 3, 23);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (5, 2, 3, 5);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (6, 1, 4, 12);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (7, 1, 5, 8);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (8, 1, 6, 21);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (9, 1, 7, 4);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (10, 1, 8, 55);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (11, 2, 8, 1);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (12, 3, 8, 2);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (13, 1, 9, 115);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (14, 1, 10, 10);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (15, 1, 11, 27);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (16, 1, 12, 21);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (17, 1, 13, 30);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (18, 2, 13, 2);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (19, 1, 14, 12);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (20, 2, 14, 91);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (21, 3, 14, 17);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (22, 1, 15, 12);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (23, 2, 15, 1);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (24, 1, 16, 11);
+INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (25, 2, 16, 65);
+
+-- ------------------------------------------------------------
+-- Избранное
+-- ------------------------------------------------------------
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (1, 1, 1);
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (2, 1, 3);
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (3, 1, 8);
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (4, 1, 14);
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (5, 6, 10);
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (6, 6, 13);
+INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (7, 6, 16);
+
+-- ------------------------------------------------------------
+-- Корзина
+-- ------------------------------------------------------------
+INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (1, 1, 1, 1);
+INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (2, 1, 2, 8);
+INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (3, 1, 1, 13);
+INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (4, 6, 2, 3);
+
+-- ------------------------------------------------------------
+-- Заказы
+-- 1 — новый, СБП, ожидает проверки
+-- 2 — подтверждён, СБП, оплачен, продавец может передать
+-- 3 — новый, СБП, мультипродавцовый
+-- 4 — передан в доставку
+-- 5 — доставлен, оплата при получении
+-- 6 — отменён
+-- ------------------------------------------------------------
+INSERT INTO ORDERS
+    (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
+     PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
+VALUES
+    (1, 1, 6998.00, 1, 'г. Муром, ул. Кленовая, д. 30, кв. 11',
+     TIMESTAMP '2026-11-08 18:15:00', 1, 2, 1);
+
+INSERT INTO ORDERS
+    (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
+     PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
+VALUES
+    (2, 6, 1295.00, 2, 'г. Муром, ул. Куйбышева, д. 17, кв. 10',
+     TIMESTAMP '2026-11-09 10:20:00', 1, 3, 1);
+
+INSERT INTO ORDERS
+    (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
+     PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
+VALUES
+    (3, 1, 23974.00, 1, 'г. Муром, ул. Свердлова, д. 33, кв. 1',
+     TIMESTAMP '2026-11-09 12:05:00', 1, 2, 1);
+
+INSERT INTO ORDERS
+    (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
+     PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
+VALUES
+    (4, 6, 4999.00, 4, 'г. Муром, ул. Пушкина, д. 5, кв. 7',
+     TIMESTAMP '2026-11-07 12:00:00', 1, 3, 2);
+
+INSERT INTO ORDERS
+    (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
+     PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
+VALUES
+    (5, 1, 15975.00, 5, 'г. Муром, ул. Ленина, д. 1, кв. 2',
+     TIMESTAMP '2026-11-01 09:30:00', 2, 3, 3);
+
+INSERT INTO ORDERS
+    (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
+     PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
+VALUES
+    (6, 1, 6244.00, 6, 'г. Муром, ул. Мечникова, д. 8, кв. 4',
+     TIMESTAMP '2026-11-06 16:40:00', 2, 4, 4);
+
+-- ------------------------------------------------------------
+-- Позиции заказов
+-- ------------------------------------------------------------
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (1, 1, 1, 4999.00, 1);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (2, 1, 1, 1999.00, 3);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (3, 2, 1, 758.12, 9);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (4, 2, 1, 536.88, 10);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (5, 3, 1, 7999.00, 2);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (6, 3, 1, 15975.00, 14);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (7, 4, 1, 4999.00, 1);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (8, 5, 1, 15975.00, 14);
+
+INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
+VALUES (9, 6, 1, 6244.00, 16);
+
+-- ------------------------------------------------------------
+-- Участие продавцов в заказах
+-- ------------------------------------------------------------
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (1, 1, 2, 0, 0);
+
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (2, 2, 4, 1, 0);
+
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (3, 3, 2, 0, 0);
+
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (4, 3, 4, 1, 0);
+
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (5, 4, 2, 1, 1);
+
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (6, 5, 4, 1, 1);
+
+INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
+VALUES (7, 6, 5, 0, 0);
+
+COMMIT;
+
+-- ------------------------------------------------------------
+-- Синхронизация генераторов с максимальными ID
+-- ------------------------------------------------------------
+SET GENERATOR GEN_USERS_ID TO 6;
+SET GENERATOR GEN_CATEGORIES_ID TO 13;
+SET GENERATOR GEN_WAREHOUSES_ID TO 3;
+SET GENERATOR GEN_PRODUCTS_ID TO 16;
+SET GENERATOR GEN_SELLER_PRODUCTS_ID TO 16;
+SET GENERATOR GEN_WAREHOUSE_PRODUCTS_ID TO 25;
+SET GENERATOR GEN_FAVORITES_ID TO 7;
+SET GENERATOR GEN_CART_ITEMS_ID TO 4;
+SET GENERATOR GEN_ORDERS_ID TO 6;
+SET GENERATOR GEN_ORDER_ITEMS_ID TO 9;
+SET GENERATOR GEN_ORDER_SELLERS_ID TO 7;
+
+COMMIT;

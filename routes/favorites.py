@@ -84,6 +84,9 @@ def favorites_remove(product_id):
 
 @favorites_bp.route("/favorites")
 def favorites():
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+
     connection = get_connection()
     cursor = connection.cursor()
 

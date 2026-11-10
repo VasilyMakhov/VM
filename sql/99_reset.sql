@@ -1,0 +1,51 @@
+-- ============================================================
+-- VM² — очистка тестовых данных
+-- ============================================================
+-- ВНИМАНИЕ! Скрипт удаляет ВСЕ данные из всех таблиц.
+-- Схема, ограничения, генераторы и триггеры остаются на месте.
+--
+--   isql-fb -q -ch UTF8 -u SYSDBA -p masterkey /db/wb_vasa.fdb -i sql/99_reset.sql
+--
+-- После очистки можно снова выполнить sql/02_seed.sql.
+-- ============================================================
+
+SET SQL DIALECT 3;
+SET NAMES UTF8;
+
+DELETE FROM ORDER_SELLERS;
+DELETE FROM ORDER_ITEMS;
+DELETE FROM ORDERS;
+
+DELETE FROM CART_ITEMS;
+DELETE FROM FAVORITES;
+
+DELETE FROM WAREHOUSE_PRODUCTS;
+DELETE FROM SELLER_PRODUCTS;
+DELETE FROM PRODUCTS;
+
+DELETE FROM WAREHOUSES;
+DELETE FROM CATEGORIES;
+
+DELETE FROM USERS;
+DELETE FROM ROLES;
+
+DELETE FROM ORDER_STATUSES;
+DELETE FROM PAYMENT_METHODS;
+DELETE FROM PAYMENT_STATUSES;
+DELETE FROM DELIVERY_STATUSES;
+
+COMMIT;
+
+SET GENERATOR GEN_USERS_ID TO 0;
+SET GENERATOR GEN_CATEGORIES_ID TO 0;
+SET GENERATOR GEN_WAREHOUSES_ID TO 0;
+SET GENERATOR GEN_PRODUCTS_ID TO 0;
+SET GENERATOR GEN_SELLER_PRODUCTS_ID TO 0;
+SET GENERATOR GEN_WAREHOUSE_PRODUCTS_ID TO 0;
+SET GENERATOR GEN_FAVORITES_ID TO 0;
+SET GENERATOR GEN_CART_ITEMS_ID TO 0;
+SET GENERATOR GEN_ORDERS_ID TO 0;
+SET GENERATOR GEN_ORDER_ITEMS_ID TO 0;
+SET GENERATOR GEN_ORDER_SELLERS_ID TO 0;
+
+COMMIT;

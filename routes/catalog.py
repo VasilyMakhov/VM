@@ -397,17 +397,18 @@ def seller_handover(order_id):
     try:
         seller_id = session["user_id"]
         cursor.execute("""
-            SELECT PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, STATUS_ID,
-                   DELIVERY_STATUS_ID
-            FROM ORDERS
-            WHERE ID = ?
-              AND EXISTS (
-                  SELECT 1
-                  FROM ORDER_SELLERS
-                  WHERE ORDER_ID = ORDERS.ID
-                    AND SELLER_ID = ?
-              )
-        """, (order_id, seller_id))
+            SELECT
+                o.PAYMENT_METHOD_ID,
+                o.PAYMENT_STATUS_ID,
+                o.STATUS_ID,
+                o.DELIVERY_STATUS_ID,
+                ords.PAYMENT_CONFIRMED
+            FROM ORDERS o
+            JOIN ORDER_SELLERS ords
+                ON ords.ORDER_ID = o.ID
+               AND ords.SELLER_ID = ?
+            WHERE o.ID = ?
+        """, (seller_id, order_id))
 
         order = cursor.fetchone()
 
@@ -419,10 +420,23 @@ def seller_handover(order_id):
         payment_status_id = order[1]
         status_id = order[2]
         delivery_status_id = order[3]
+        payment_confirmed = order[4]
 
         if status_id in (5, 6) or delivery_status_id in (3, 4):
             flash("Этот заказ уже завершён или отменён.", "error")
             return redirect(url_for("catalog.seller_orders"))
+
+        if payment_status_id == 4:
+            flash("Оплата по заказу отклонена. Передача товара невозможна.", "error")
+            return redirect(url_for("catalog.seller_orders"))
+
+        if payment_method_id == 1:
+            if not payment_confirmed or payment_status_id not in (2, 3):
+                flash(
+                    "Сначала подтвердите оплату, затем передавайте товар.",
+                    "error"
+                )
+                return redirect(url_for("catalog.seller_orders"))
 
         cursor.execute("""
             UPDATE ORDER_SELLERS

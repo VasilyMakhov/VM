@@ -2,3 +2,4 @@ venv/
 test_db.py
 __pycache__/
 static/images/
+*.local.md

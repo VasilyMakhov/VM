@@ -21,3 +21,7 @@ app.register_blueprint(moderator_bp)
 
 if __name__ == "__main__":
     app.run(debug=1, port=2911)
+
+# seller1 - 123456 есть бомбер и корм
+# $eller - qqqwww123 есть мяч и телек
+# prodavan228 - 123456 Кросы и стол

@@ -48,7 +48,6 @@ def register():
         last_name = request.form.get("last_name", "").strip()     
         role_id = request.form.get("role_id", "1").strip()
 
-        print("ROLE ID --- ", repr(role_id) )
 
         if not login or not email or not password or not first_name or not last_name:
             return render_template("register.html", error="Заполните все поля"), 400

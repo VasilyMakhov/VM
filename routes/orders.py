@@ -276,7 +276,6 @@ def confirm_payment(order_id):
 
     except Exception as error:
         connection.rollback()
-        print("Ошибка обновления оплаты:", error)
         flash("Не удалось обновить статус оплаты", "error")
         return redirect(url_for("catalog.catalog"))
 
@@ -384,7 +383,6 @@ def confirm_receipt(order_id):
 
     except Exception as error:
         connection.rollback()
-        print("Ошибка подтверждения получения:", error)
         flash("Не удалось подтвердить получение заказа.", "error")
 
     finally:
