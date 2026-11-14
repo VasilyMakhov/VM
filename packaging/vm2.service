@@ -1,0 +1,24 @@
+[Unit]
+Description=VM2 — учебный маркетплейс на Flask и Firebird
+Documentation=file:///usr/share/doc/vm2/README.md
+After=network-online.target firebird.service
+Wants=network-online.target
+Requires=firebird.service
+
+[Service]
+Type=simple
+User=vm2
+Group=vm2
+WorkingDirectory=/opt/vm2
+EnvironmentFile=-/etc/sysconfig/vm2
+ExecStartPre=+/usr/libexec/vm2/vm2-init-db
+
+ExecStart=/opt/vm2/venv/bin/python /opt/vm2/app.py
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

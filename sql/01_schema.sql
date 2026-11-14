@@ -1,18 +1,6 @@
--- ============================================================
--- VM² — схема базы данных
--- ============================================================
--- Скрипт создаёт таблицы, ограничения, генераторы и триггеры.
--- Запускать на пустой базе, созданной sql/00_create_database.sql.
---
---   isql-fb -q -ch UTF8 -u SYSDBA -p masterkey /db/wb_vasa.fdb -i sql/01_schema.sql
--- ============================================================
-
 SET SQL DIALECT 3;
 SET NAMES UTF8;
 
--- ------------------------------------------------------------
--- Генераторы (sequences)
--- ------------------------------------------------------------
 CREATE GENERATOR GEN_USERS_ID;
 CREATE GENERATOR GEN_CATEGORIES_ID;
 CREATE GENERATOR GEN_WAREHOUSES_ID;
@@ -27,9 +15,6 @@ CREATE GENERATOR GEN_ORDER_SELLERS_ID;
 
 COMMIT;
 
--- ------------------------------------------------------------
--- Справочники
--- ------------------------------------------------------------
 CREATE TABLE ROLES (
     ID   INTEGER NOT NULL,
     NAME VARCHAR(50) NOT NULL,
@@ -65,9 +50,7 @@ CREATE TABLE DELIVERY_STATUSES (
     CONSTRAINT UQ_DELIVERY_STATUSES_NAME UNIQUE (NAME)
 );
 
--- ------------------------------------------------------------
--- Пользователи
--- ------------------------------------------------------------
+
 CREATE TABLE USERS (
     ID         INTEGER NOT NULL,
     LOGIN      VARCHAR(50) NOT NULL,
@@ -81,9 +64,7 @@ CREATE TABLE USERS (
     CONSTRAINT UQ_USERS_EMAIL UNIQUE (EMAIL)
 );
 
--- ------------------------------------------------------------
--- Категории и склады
--- ------------------------------------------------------------
+
 CREATE TABLE CATEGORIES (
     ID          INTEGER NOT NULL,
     NAME        VARCHAR(100) NOT NULL,
@@ -99,9 +80,7 @@ CREATE TABLE WAREHOUSES (
     CONSTRAINT PK_WAREHOUSES PRIMARY KEY (ID)
 );
 
--- ------------------------------------------------------------
--- Товары и предложения продавцов
--- ------------------------------------------------------------
+
 CREATE TABLE PRODUCTS (
     ID          INTEGER NOT NULL,
     CATEGORY_ID INTEGER NOT NULL,
@@ -130,9 +109,7 @@ CREATE TABLE WAREHOUSE_PRODUCTS (
     CONSTRAINT CHK_WAREHOUSE_QUANTITY CHECK (QUANTITY >= 0)
 );
 
--- ------------------------------------------------------------
--- Избранное и корзина
--- ------------------------------------------------------------
+
 CREATE TABLE FAVORITES (
     ID         INTEGER NOT NULL,
     USER_ID    INTEGER NOT NULL,
@@ -151,9 +128,7 @@ CREATE TABLE CART_ITEMS (
     CONSTRAINT CHK_CART_QUANTITY CHECK (QUANTITY > 0)
 );
 
--- ------------------------------------------------------------
--- Заказы
--- ------------------------------------------------------------
+
 CREATE TABLE ORDERS (
     ID                 INTEGER NOT NULL,
     USER_ID            INTEGER NOT NULL,
@@ -191,9 +166,7 @@ CREATE TABLE ORDER_SELLERS (
 
 COMMIT;
 
--- ------------------------------------------------------------
--- Внешние ключи
--- ------------------------------------------------------------
+
 ALTER TABLE USERS
     ADD CONSTRAINT FK_USERS_ROLE
     FOREIGN KEY (ROLE_ID) REFERENCES ROLES (ID);
@@ -272,9 +245,7 @@ ALTER TABLE ORDER_SELLERS
 
 COMMIT;
 
--- ------------------------------------------------------------
--- Индексы на внешние ключи, не покрытые UNIQUE-ограничениями
--- ------------------------------------------------------------
+
 CREATE INDEX IDX_USERS_ROLE ON USERS (ROLE_ID);
 
 CREATE INDEX IDX_PRODUCTS_CATEGORY ON PRODUCTS (CATEGORY_ID);
@@ -300,9 +271,7 @@ CREATE INDEX IDX_ORDER_SELLERS_SELLER ON ORDER_SELLERS (SELLER_ID);
 
 COMMIT;
 
--- ------------------------------------------------------------
--- Триггеры генерации ID
--- ------------------------------------------------------------
+
 SET TERM ^ ;
 
 CREATE TRIGGER BI_USERS_ID FOR USERS

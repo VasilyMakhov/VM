@@ -1,0 +1,14 @@
+VM2_DB_PATH=/var/lib/vm2/vm2.fdb
+VM2_DB_HOST=localhost
+
+VM2_DB_USER=SYSDBA
+VM2_DB_PASSWORD=masterkey
+VM2_SQL_DIR=/opt/vm2/sql
+
+VM2_LOAD_SEED=1
+
+VM2_FB_USER=auto
+VM2_FB_GROUP=auto
+
+VM2_DEBUG=0
+VM2_PORT=2911

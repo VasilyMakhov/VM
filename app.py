@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, session
 from db import get_connection 
 from routes.cart import cart_bp
@@ -20,7 +22,10 @@ app.register_blueprint(favorites_bp)
 app.register_blueprint(moderator_bp)
 
 if __name__ == "__main__":
-    app.run(debug=1, port=2911)
+    app.run(
+        debug=os.environ.get("VM2_DEBUG", "1") == "1",
+        port=int(os.environ.get("VM2_PORT", "2911"))
+    )
 
 # seller1 - 123456 есть бомбер и корм
 # $eller - qqqwww123 есть мяч и телек

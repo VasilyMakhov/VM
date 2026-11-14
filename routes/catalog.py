@@ -195,11 +195,43 @@ def seller_orders():
     if str(session.get("user_role")) != "2":
         return redirect(url_for("catalog.catalog"))
 
+    selected_status = request.args.get("status", "")
+    sort = request.args.get("sort", "date_desc")
+
+    selected_status_id = None
+
+    if selected_status:
+        try:
+            selected_status_id = int(selected_status)
+        except ValueError:
+            selected_status = ""
+
+    order_by = "ORDER BY o.CREATED_AT DESC, o.ID DESC, p.NAME"
+
+    if sort == "date_asc":
+        order_by = "ORDER BY o.CREATED_AT ASC, o.ID ASC, p.NAME"
+    elif sort == "status":
+        order_by = "ORDER BY o.STATUS_ID, o.CREATED_AT DESC, o.ID DESC, p.NAME"
+    elif sort == "status_desc":
+        order_by = "ORDER BY o.STATUS_ID DESC, o.CREATED_AT DESC, o.ID DESC, p.NAME"
+    else:
+        sort = "date_desc"
+
     connection = get_connection()
     cursor = connection.cursor()
 
     try:
         cursor.execute("""
+            SELECT
+                ID,
+                NAME
+            FROM ORDER_STATUSES
+            ORDER BY ID
+        """)
+
+        statuses = cursor.fetchall()
+
+        query = """
             SELECT
                 o.ID,
                 o.CREATED_AT,
@@ -239,8 +271,17 @@ def seller_orders():
             JOIN PRODUCTS p
                 ON p.ID = sp.PRODUCT_ID
             WHERE ords.SELLER_ID = ?
-            ORDER BY o.CREATED_AT DESC, o.ID DESC, p.NAME
-        """, (session["user_id"],))
+        """
+
+        params = [session["user_id"]]
+
+        if selected_status_id is not None:
+            query += " AND o.STATUS_ID = ?"
+            params.append(selected_status_id)
+
+        query += " " + order_by
+
+        cursor.execute(query, params)
 
         rows = cursor.fetchall()
 
@@ -283,7 +324,10 @@ def seller_orders():
 
         return render_template(
             "seller_orders.html",
-            orders=orders
+            orders=orders,
+            statuses=statuses,
+            selected_status=selected_status,
+            sort=sort
         )
 
     finally:

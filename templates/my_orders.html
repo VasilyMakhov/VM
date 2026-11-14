@@ -8,6 +8,30 @@
     <p>История заказов и информация об оплате</p>
 </div>
 
+<form method="GET" action="{{ url_for('orders.my_orders') }}" class="filter-form">
+    <div class="filter-group">
+        <label for="status">Статус заказа:</label>
+        <select name="status" id="status">
+            <option value="">Все статусы</option>
+            {% for status in statuses %}
+                <option value="{{ status[0] }}" {% if selected_status == status[0]|string %}selected{% endif %}>
+                    {{ status[1] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="sort">Сортировка:</label>
+        <select name="sort" id="sort">
+            <option value="date_desc" {% if sort == "date_desc" %}selected{% endif %}>Сначала новые</option>
+            <option value="date_asc" {% if sort == "date_asc" %}selected{% endif %}>Сначала старые</option>
+            <option value="status" {% if sort == "status" %}selected{% endif %}>По статусу</option>
+            <option value="status_desc" {% if sort == "status_desc" %}selected{% endif %}>По статусу в обратном порядке</option>
+        </select>
+    </div>
+
+    <button type="submit" class="filter-btn">Применить</button>
+</form>
+
 <div class="my-orders">
     {% if orders %}
         <div class="orders-list">
@@ -25,6 +49,17 @@
                         <form method="POST"
                             action="{{ url_for('orders.confirm_receipt', order_id=order[0]) }}">
                             <button type="submit">Подтвердить получение</button>
+                        </form>
+                    {% endif %}
+
+                    {% if order[7] not in (5, 6)
+                        and order[8] not in (3, 4)
+                        and order[9] == 0 %}
+                        <form method="POST"
+                            action="{{ url_for('orders.cancel_order', order_id=order[0]) }}">
+                            <button type="submit" class="danger-btn">
+                                Отменить заказ
+                            </button>
                         </form>
                     {% endif %}
                 </div>

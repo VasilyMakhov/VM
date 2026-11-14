@@ -1,28 +1,11 @@
--- ============================================================
--- VM² — тестовые данные
--- ============================================================
--- Запускать после sql/01_schema.sql на пустой базе.
---
---   isql-fb -q -ch UTF8 -u SYSDBA -p masterkey /db/wb_vasa.fdb -i sql/02_seed.sql
---
--- Скрипт вставляет данные с явными ID, чтобы ссылки между
--- таблицами были предсказуемыми. После вставки генераторы
--- переводятся на максимальные значения.
--- ============================================================
-
 SET SQL DIALECT 3;
 SET NAMES UTF8;
 
--- ------------------------------------------------------------
--- Роли
--- ------------------------------------------------------------
+
 INSERT INTO ROLES (ID, NAME) VALUES (1, 'Пользователь');
 INSERT INTO ROLES (ID, NAME) VALUES (2, 'Продавец');
 INSERT INTO ROLES (ID, NAME) VALUES (3, 'Модератор');
 
--- ------------------------------------------------------------
--- Статусы заказа
--- ------------------------------------------------------------
 INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (1, 'Новый');
 INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (2, 'Подтверждён');
 INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (3, 'Собирается');
@@ -30,31 +13,19 @@ INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (4, 'Передан в достав
 INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (5, 'Доставлен');
 INSERT INTO ORDER_STATUSES (ID, NAME) VALUES (6, 'Отменён');
 
--- ------------------------------------------------------------
--- Способы оплаты
--- ------------------------------------------------------------
 INSERT INTO PAYMENT_METHODS (ID, NAME) VALUES (1, 'СБП');
 INSERT INTO PAYMENT_METHODS (ID, NAME) VALUES (2, 'При получении');
 
--- ------------------------------------------------------------
--- Статусы оплаты
--- ------------------------------------------------------------
 INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (1, 'Ожидает оплаты');
 INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (2, 'Ожидает проверки');
 INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (3, 'Оплачено');
 INSERT INTO PAYMENT_STATUSES (ID, NAME) VALUES (4, 'Отклонено');
 
--- ------------------------------------------------------------
--- Статусы доставки
--- ------------------------------------------------------------
 INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (1, 'Не отправлен');
 INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (2, 'В пути');
 INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (3, 'Доставлен');
 INSERT INTO DELIVERY_STATUSES (ID, NAME) VALUES (4, 'Отменён');
 
--- ------------------------------------------------------------
--- Пользователи
--- ------------------------------------------------------------
 INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
 VALUES (1, 'testuser', 'user@vm.ru', '123456', 'Иван', 'Покупатель', 1);
 
@@ -73,9 +44,6 @@ VALUES (5, 'prodavan228', 'money@more.ru', '123456', 'Никита', 'Черно
 INSERT INTO USERS (ID, LOGIN, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME, ROLE_ID)
 VALUES (6, 'buyer2', 'buyer2@vm.ru', '123456', 'Данила', 'Кочетов', 1);
 
--- ------------------------------------------------------------
--- Категории
--- ------------------------------------------------------------
 INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
     (1, 'Электроника', 'Электронные устройства и аксессуары');
 
@@ -115,9 +83,6 @@ INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
 INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES
     (13, 'Товары для животных', 'Кормушки, миски, игрушки и аксессуары для животных');
 
--- ------------------------------------------------------------
--- Склады
--- ------------------------------------------------------------
 INSERT INTO WAREHOUSES (ID, NAME, ADDRESS) VALUES
     (1, 'Основной склад', 'г. Москва, ул. Центральная, д. 10');
 
@@ -127,9 +92,6 @@ INSERT INTO WAREHOUSES (ID, NAME, ADDRESS) VALUES
 INSERT INTO WAREHOUSES (ID, NAME, ADDRESS) VALUES
     (3, 'Склад N29', 'г. Самара, ул. Куйбышева, д. 33');
 
--- ------------------------------------------------------------
--- Товары
--- ------------------------------------------------------------
 INSERT INTO PRODUCTS (ID, CATEGORY_ID, NAME, DESCRIPTION, IMAGE_URL, PRICE)
 VALUES (1, 1, 'Беспроводные наушники',
         'Беспроводные наушники с Bluetooth, плотно сидят и хорошо передают звук.',
@@ -210,12 +172,6 @@ VALUES (16, 4, 'Кроссовки Adidas x Jeremy Scott Wings 2.0',
         'Кроссовки Adidas x Jeremy Scott Wings 2.0 USA Flag.',
         '/static/images/2ce998b7bf73438c8893947ea4eb4133.webp', 6244.00);
 
--- ------------------------------------------------------------
--- Предложения продавцов
--- seller1 (ID 2)       → товары 1–7
--- $eller (ID 4)        → товары 8–10, 13–15
--- prodavan228 (ID 5)   → товары 11, 12, 16
--- ------------------------------------------------------------
 INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (1, 2, 1);
 INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (2, 2, 2);
 INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (3, 2, 3);
@@ -233,9 +189,7 @@ INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (14, 4, 14);
 INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (15, 4, 15);
 INSERT INTO SELLER_PRODUCTS (ID, SELLER_ID, PRODUCT_ID) VALUES (16, 5, 16);
 
--- ------------------------------------------------------------
--- Остатки на складах
--- ------------------------------------------------------------
+
 INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (1, 1, 1, 15);
 INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (2, 2, 1, 3);
 INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (3, 1, 2, 8);
@@ -262,9 +216,6 @@ INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) V
 INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (24, 1, 16, 11);
 INSERT INTO WAREHOUSE_PRODUCTS (ID, WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY) VALUES (25, 2, 16, 65);
 
--- ------------------------------------------------------------
--- Избранное
--- ------------------------------------------------------------
 INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (1, 1, 1);
 INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (2, 1, 3);
 INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (3, 1, 8);
@@ -273,23 +224,11 @@ INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (5, 6, 10);
 INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (6, 6, 13);
 INSERT INTO FAVORITES (ID, USER_ID, PRODUCT_ID) VALUES (7, 6, 16);
 
--- ------------------------------------------------------------
--- Корзина
--- ------------------------------------------------------------
 INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (1, 1, 1, 1);
 INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (2, 1, 2, 8);
 INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (3, 1, 1, 13);
 INSERT INTO CART_ITEMS (ID, USER_ID, QUANTITY, SELLER_PRODUCT_ID) VALUES (4, 6, 2, 3);
 
--- ------------------------------------------------------------
--- Заказы
--- 1 — новый, СБП, ожидает проверки
--- 2 — подтверждён, СБП, оплачен, продавец может передать
--- 3 — новый, СБП, мультипродавцовый
--- 4 — передан в доставку
--- 5 — доставлен, оплата при получении
--- 6 — отменён
--- ------------------------------------------------------------
 INSERT INTO ORDERS
     (ID, USER_ID, TOTAL_PRICE, STATUS_ID, DELIVERY_ADDRESS, CREATED_AT,
      PAYMENT_METHOD_ID, PAYMENT_STATUS_ID, DELIVERY_STATUS_ID)
@@ -332,9 +271,7 @@ VALUES
     (6, 1, 6244.00, 6, 'г. Муром, ул. Мечникова, д. 8, кв. 4',
      TIMESTAMP '2026-11-06 16:40:00', 2, 4, 4);
 
--- ------------------------------------------------------------
--- Позиции заказов
--- ------------------------------------------------------------
+
 INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
 VALUES (1, 1, 1, 4999.00, 1);
 
@@ -362,9 +299,6 @@ VALUES (8, 5, 1, 15975.00, 14);
 INSERT INTO ORDER_ITEMS (ID, ORDER_ID, QUANTITY, PRICE, SELLER_PRODUCT_ID)
 VALUES (9, 6, 1, 6244.00, 16);
 
--- ------------------------------------------------------------
--- Участие продавцов в заказах
--- ------------------------------------------------------------
 INSERT INTO ORDER_SELLERS (ID, ORDER_ID, SELLER_ID, PAYMENT_CONFIRMED, HANDED_TO_DELIVERY)
 VALUES (1, 1, 2, 0, 0);
 
@@ -388,9 +322,6 @@ VALUES (7, 6, 5, 0, 0);
 
 COMMIT;
 
--- ------------------------------------------------------------
--- Синхронизация генераторов с максимальными ID
--- ------------------------------------------------------------
 SET GENERATOR GEN_USERS_ID TO 6;
 SET GENERATOR GEN_CATEGORIES_ID TO 13;
 SET GENERATOR GEN_WAREHOUSES_ID TO 3;

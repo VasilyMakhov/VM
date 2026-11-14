@@ -849,3 +849,9 @@ label{
     font-size: 14px;
     color: gray;
 }
+
+.moderator-products-links {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}

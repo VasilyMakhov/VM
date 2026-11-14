@@ -3,6 +3,51 @@ from db import get_connection
 
 orders_bp = Blueprint("orders", __name__)
 
+
+def restore_order_stock(cursor, order_id):
+    cursor.execute("""
+        SELECT
+            SELLER_PRODUCT_ID,
+            QUANTITY
+        FROM ORDER_ITEMS
+        WHERE ORDER_ID = ?
+        ORDER BY ID
+    """, (order_id,))
+
+    items = cursor.fetchall()
+
+    for seller_product_id, quantity in items:
+        cursor.execute("""
+            SELECT FIRST 1 ID
+            FROM WAREHOUSE_PRODUCTS
+            WHERE SELLER_PRODUCT_ID = ?
+            ORDER BY WAREHOUSE_ID
+        """, (seller_product_id,))
+
+        warehouse_product = cursor.fetchone()
+
+        if warehouse_product is not None:
+            cursor.execute("""
+                UPDATE WAREHOUSE_PRODUCTS
+                SET QUANTITY = QUANTITY + ?
+                WHERE ID = ?
+            """, (quantity, warehouse_product[0]))
+            continue
+
+        cursor.execute("""
+            SELECT FIRST 1 ID
+            FROM WAREHOUSES
+            ORDER BY ID
+        """)
+        warehouse = cursor.fetchone()
+
+        if warehouse is not None:
+            cursor.execute("""
+                INSERT INTO WAREHOUSE_PRODUCTS
+                    (WAREHOUSE_ID, SELLER_PRODUCT_ID, QUANTITY)
+                VALUES (?, ?, ?)
+            """, (warehouse[0], seller_product_id, quantity))
+
 @orders_bp.route("/checkout", methods=["GET", "POST"])
 def checkout():
     if not session.get("user_id"):
@@ -289,11 +334,43 @@ def my_orders():
     if not session.get("user_id"):
         return redirect(url_for("auth.login"))
 
+    selected_status = request.args.get("status", "")
+    sort = request.args.get("sort", "date_desc")
+
+    selected_status_id = None
+
+    if selected_status:
+        try:
+            selected_status_id = int(selected_status)
+        except ValueError:
+            selected_status = ""
+
+    order_by = "ORDER BY o.CREATED_AT DESC"
+
+    if sort == "date_asc":
+        order_by = "ORDER BY o.CREATED_AT ASC"
+    elif sort == "status":
+        order_by = "ORDER BY o.STATUS_ID, o.CREATED_AT DESC"
+    elif sort == "status_desc":
+        order_by = "ORDER BY o.STATUS_ID DESC, o.CREATED_AT DESC"
+    else:
+        sort = "date_desc"
+
     connection = get_connection()
     cursor = connection.cursor()
 
     try:
         cursor.execute("""
+            SELECT
+            ID,
+            NAME
+            FROM ORDER_STATUSES
+            ORDER BY ID
+        """)
+
+        statuses = cursor.fetchall()
+
+        query = """
             SELECT
             o.ID,
             o.CREATED_AT,
@@ -303,7 +380,13 @@ def my_orders():
             ps.NAME,
             ds.NAME,
             o.STATUS_ID,
-            o.DELIVERY_STATUS_ID
+            o.DELIVERY_STATUS_ID,
+            (
+                SELECT COUNT(*)
+                FROM ORDER_SELLERS ords
+                WHERE ords.ORDER_ID = o.ID
+                  AND ords.HANDED_TO_DELIVERY = 1
+            )
             FROM ORDERS o
             JOIN ORDER_STATUSES os
             ON os.ID = o.STATUS_ID
@@ -314,15 +397,107 @@ def my_orders():
             JOIN DELIVERY_STATUSES ds
             ON ds.ID = o.DELIVERY_STATUS_ID
             WHERE o.USER_ID = ?
-            ORDER BY o.CREATED_AT DESC
-        """, (session["user_id"],))
+        """
+
+        params = [session["user_id"]]
+
+        if selected_status_id is not None:
+            query += " AND o.STATUS_ID = ?"
+            params.append(selected_status_id)
+
+        query += " " + order_by
+
+        cursor.execute(query, params)
 
         orders = cursor.fetchall()
 
     finally:
         connection.close()
 
-    return render_template("my_orders.html", orders=orders)
+    return render_template(
+        "my_orders.html",
+        orders=orders,
+        statuses=statuses,
+        selected_status=selected_status,
+        sort=sort
+    )
+
+@orders_bp.route("/orders/<int:order_id>/cancel", methods=["POST"])
+def cancel_order(order_id):
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login"))
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                STATUS_ID,
+                DELIVERY_STATUS_ID
+            FROM ORDERS
+            WHERE ID = ?
+              AND USER_ID = ?
+        """, (order_id, session["user_id"]))
+
+        order = cursor.fetchone()
+
+        if order is None:
+            flash("Заказ не найден.", "error")
+            return redirect(url_for("orders.my_orders"))
+
+        status_id = order[0]
+        delivery_status_id = order[1]
+
+        if status_id in (5, 6) or delivery_status_id in (3, 4):
+            flash("Этот заказ уже нельзя отменить.", "error")
+            return redirect(url_for("orders.my_orders"))
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM ORDER_SELLERS
+            WHERE ORDER_ID = ?
+              AND HANDED_TO_DELIVERY = 1
+        """, (order_id,))
+
+        handed_count = cursor.fetchone()[0]
+
+        if handed_count > 0:
+            flash(
+                "Продавец уже передал товар в доставку. Отмена невозможна.",
+                "error"
+            )
+            return redirect(url_for("orders.my_orders"))
+
+        cursor.execute("""
+            UPDATE ORDERS
+            SET STATUS_ID = 6,
+                DELIVERY_STATUS_ID = 4
+            WHERE ID = ?
+              AND USER_ID = ?
+              AND STATUS_ID NOT IN (5, 6)
+              AND DELIVERY_STATUS_ID NOT IN (3, 4)
+        """, (order_id, session["user_id"]))
+
+        if cursor.rowcount != 1:
+            connection.rollback()
+            flash("Не удалось отменить заказ.", "error")
+            return redirect(url_for("orders.my_orders"))
+
+        restore_order_stock(cursor, order_id)
+
+        connection.commit()
+
+        flash("Заказ отменён, товары возвращены на склад.", "success")
+
+    except Exception:
+        connection.rollback()
+        flash("Не удалось отменить заказ.", "error")
+
+    finally:
+        connection.close()
+
+    return redirect(url_for("orders.my_orders"))
 
 @orders_bp.route("/orders/<int:order_id>/confirm-receipt", methods=["POST"])
 def confirm_receipt(order_id):
